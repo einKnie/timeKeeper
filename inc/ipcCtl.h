@@ -7,7 +7,7 @@
 enum opType {
   ENone = 0,
   EStartCtr,
-  EStopCtr,
+  EShowInfo,
   ESetName,
   EGetTime,
   ESave

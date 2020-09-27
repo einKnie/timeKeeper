@@ -5,6 +5,7 @@
 #include <string.h>
 
 #include "ipcCtl.h"
+#include "taskCtl.h"
 
 struct msgQueue {
   key_t key;
@@ -89,8 +90,28 @@ int sendMsg(struct msg message) {
 }
 
 int handleMsg(struct msg message) {
-  int ret = 0;
+  int ret = 1;
   printf("handling message\n");
+
+  switch(message.type) {
+    case EStartCtr:
+      switchToTask(message.idx);
+      break;
+    case ESetName:
+      printf("set task name (%s) for task %d\n", message.text, message.idx);
+      setTaskName(message.idx, message.text);
+      break;
+    case EShowInfo:
+      printf("show info notification\n");
+      break;
+    case ESave:
+      storeTaskData(message.idx, g_savefile);
+      break;
+    default:
+      printf("invalid message received\n");
+      return 0;
+  }
+
   return ret;
 }
 

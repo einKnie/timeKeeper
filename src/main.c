@@ -22,11 +22,11 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include <linux/limits.h>
 #include <signal.h>
 
 #include "procMgr.h"
 #include "ipcCtl.h"
+#include "taskCtl.h"
 
 void cleanup(void);
 void sigHdl(const int signum);
@@ -34,10 +34,15 @@ void printHelp();
 
 static const char procname[] = "timeKeeper";
 
+// declared as extern in timeKeeper.h
 char g_pidfile[PATH_MAX] = "\0";
+char g_savefile[PATH_MAX] = "\0";
+
 int  g_isDaemon = 0;
 
 int main(int argc, char **argv) {
+
+  system("notify-send -t 5 Hello");
 
   // set exit handlers
   struct sigaction act;
@@ -52,16 +57,24 @@ int main(int argc, char **argv) {
   int idx  = 0;
   char text[MAX_TEXT] = "\0";
 
+  // maybe have -t <no> as a general switch to signify task
+  // then have other options, like -n <name>, -s (start),
+
   int opt;
-  while ((opt = getopt(argc, argv, "t:s:xh")) != -1) {
+  while ((opt = getopt(argc, argv, "t:n:svxh")) != -1) {
     switch(opt) {
       case 't':
-        type = EStartCtr;
         idx = atoi(optarg);
         break;
       case 's':
-        type = EStopCtr;
-        idx = atoi(optarg);
+        type = EStartCtr;
+        break;
+      case 'v':
+        type = EShowInfo;
+        break;
+      case 'n':
+        type = ESetName;
+        strncpy(text, optarg, sizeof(text));
         break;
       case 'x':
         type = ESave;
@@ -75,13 +88,22 @@ int main(int argc, char **argv) {
     }
   }
 
-  // verify params
-  if (type < ESave) {
-    if ((idx < MIN_IDX) || (idx > MAX_IDX)) {
-      printf("error: invalid parameter given\n");
-      printHelp();
-      exit(1);
-    }
+  int err = 0;
+  if ((idx != 0) && (type == ENone)) {
+    // no action
+    printf("error: no action specified for task %d\n", idx);
+    err++;
+  }
+  if (((type == EStartCtr) || (type == ESetName)) && (idx == 0)) {
+    // action w/o task
+    printf("error: no task specified for action\n");
+    err++;
+  }
+
+  if (err) {
+    printf("invalid configuration received\n");
+    printHelp();
+    exit(1);
   }
 
   // get pidfile path
@@ -92,6 +114,7 @@ int main(int argc, char **argv) {
   }
 
   snprintf(g_pidfile, sizeof(g_pidfile), "/home/%s/.%s.pid", user, procname);
+  snprintf(g_savefile, sizeof(g_savefile), "/home/%s/.%s.dat", user, procname);
   printf("Checking pidfile at %s\n", g_pidfile);
 
   // check if a daemon is already running
@@ -119,12 +142,14 @@ int main(int argc, char **argv) {
 
   if (g_isDaemon) {
     // daemon loop
+    initTasks();
     struct msg message;
 
     while (1) {
       // daemon loop: wait for ipc here
       sleep(1);
       waitForMsg(&message);
+      handleMsg(message);
     }
   } else {
     // client stuff
@@ -148,6 +173,10 @@ void sigHdl(const int signum) {
 void cleanup(void) {
   printf("Cleaning up...\n");
   if (g_isDaemon) {
+    // cleanup tasks
+    switchToTask(0);
+    storeTaskData(0, g_savefile);
+
     if (! exitIpc()) {
       printf("error: Failed to remove message queue\n");
     }
@@ -158,13 +187,16 @@ void cleanup(void) {
 }
 
 // ----- help -----
+
 void printHelp() {
   printf("timeKeeper v.%d\n", VERSION);
-  printf("\ttimeKeeper [-t <no> -s <no> -x -h]\n");
-  printf("-t <no>\t... start tracking time of task <no>\n");
-  printf("-s <no>\t... stop tracking time of task <no>\n");
-  printf("-x     \t... write data to file and stop daemon\n");
-  printf("-h     \t... print this help message and exit\n");
+  printf("\ttimeKeeper [-t <no> -s -x  -v -h]\n");
+  printf("-t <no> \t... select operation for task <no>\n");
+  printf("-n <str>\t... set name <str> for selected task\n");
+  printf("-s      \t... start counter for selected task\n");
+  printf("-v      \t... show current task data as notification\n");
+  printf("-x      \t... write data to file and stop daemon\n");
+  printf("-h      \t... print this help message and exit\n");
   printf("\n");
   printf("Note: <no> must be an integer in range %d to %d\n", MIN_IDX, MAX_IDX);
 }
