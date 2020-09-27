@@ -57,9 +57,7 @@ Stopping the daemon process will also halt any time keeping. But current data is
 ### TODO
 
 This is a list of features that will be implemented in the future:  
-*  actual daemonisation
 *  more than one action possible per call
-*  alternative way to set name [DONE]
 *  first process should also do what it was told and not 'just' daemonize
 
 ### Example Configuration and Usage
