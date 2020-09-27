@@ -75,6 +75,15 @@ int main(int argc, char **argv) {
     }
   }
 
+  // verify params
+  if (type < ESave) {
+    if ((idx < MIN_IDX) || (idx > MAX_IDX)) {
+      printf("error: invalid parameter given\n");
+      printHelp();
+      exit(1);
+    }
+  }
+
   // get pidfile path
   char *user = NULL;
   if ((user = getlogin()) == NULL) {
@@ -151,5 +160,11 @@ void cleanup(void) {
 // ----- help -----
 void printHelp() {
   printf("timeKeeper v.%d\n", VERSION);
-  printf("tbd.\n");
+  printf("\ttimeKeeper [-t <no> -s <no> -x -h]\n");
+  printf("-t <no>\t... start tracking time of task <no>\n");
+  printf("-s <no>\t... stop tracking time of task <no>\n");
+  printf("-x     \t... write data to file and stop daemon\n");
+  printf("-h     \t... print this help message and exit\n");
+  printf("\n");
+  printf("Note: <no> must be an integer in range %d to %d\n", MIN_IDX, MAX_IDX);
 }
