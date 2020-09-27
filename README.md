@@ -50,3 +50,10 @@ The program keeps track of the cumulative time any given task was active. Thus, 
 The first running timeKeeper process will daemonize itself (wip) and keep running in the background. Any new timeKeeper process will check if the daemon is running and simply send the command via IPC to the daemon process.  
 Stopping the daemon process will also halt any time keeping. But current data is written to file upon exit, so nothing will be lost.
 
+### TODO
+
+This is a list of features that will be implemented in the future:  
+*  actual daemonisation
+*  halt all tasks (e.g. when on a break)
+*  tbd
+
