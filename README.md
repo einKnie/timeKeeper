@@ -3,7 +3,7 @@
 _This is a work in progress. The codebase as well as this README will be cleaned up once I'm done._
 
 ## Functionality
-
+[LINUX ONLY]  
 Keep track of how much time you spend on a number of tasks.
 
 
@@ -56,4 +56,6 @@ Stopping the daemon process will also halt any time keeping. But current data is
 
 This is a list of features that will be implemented in the future:  
 *  actual daemonisation
-*  tbd
+*  more than one action possible per call
+*  alternative way to set name
+*  first process should also do what it was told and not 'just' daemonize
