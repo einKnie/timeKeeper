@@ -12,16 +12,17 @@ Keep track of how much time you spend on a number of tasks.
 | cmd|action |
 |----|-------|
 |-t \<no\>   | specify a task (numbers range from 1 to 5 \*)  
-|-n \<str\>  | set a name for the specified task  
+|-n \<str\>  | set a name for the specified task  \*\*
 |-s          | start the specified task
 |-e          | stop all tasks
 |-v          | show a notification with information on tasks
-|-x          | write current task data to file \*\*
+|-x          | write current task data to file \*\*\*
 |-q          | quit the daemon process (also writes data to file)
 |-h          | print help
 
 \* number can be increased in _timeKeeper.h_  
-\*\* data is stored in $HOME/.timeKeeper.dat
+\*\* if a task without a set name is started, the user is automatically queried for a name.  
+\*\*\* data is stored in $HOME/.timeKeeper.dat
 
 ### Examples
 
@@ -57,5 +58,5 @@ Stopping the daemon process will also halt any time keeping. But current data is
 This is a list of features that will be implemented in the future:  
 *  actual daemonisation
 *  more than one action possible per call
-*  alternative way to set name
+*  alternative way to set name [DONE]
 *  first process should also do what it was told and not 'just' daemonize
