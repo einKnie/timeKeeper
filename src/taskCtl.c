@@ -1,3 +1,10 @@
+/*  _   _                _  __
+ * | |_(_)_ __ ___   ___| |/ /___  ___ _ __   ___ _ __
+ * | __| | '_ ` _ \ / _ \ ' // _ \/ _ \ '_ \ / _ \ '__|
+ * | |_| | | | | | |  __/ . \  __/  __/ |_) |  __/ |
+ *  \__|_|_| |_| |_|\___|_|\_\___|\___| .__/ \___|_|
+ *   <einKnie@gmx.at>                 |_|
+ */
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -5,7 +12,6 @@
 #include <fcntl.h>
 #include <errno.h>
 #include "taskCtl.h"
-
 
 taskData_t g_tasks;
 int        g_taskInit = 0;
