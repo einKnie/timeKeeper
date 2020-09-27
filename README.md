@@ -37,13 +37,14 @@ Keep track of how much time you spend on a number of tasks.
 #### Example logfile
 
     ...
-    2020-09-27 17:00:07
-    Task 1;"meetings";00:22:15
-    Task 2;"";00:00:00
-    Task 3;"";00:05:18 [x]   <-- x denotes the currently active task
-    Task 4;"";00:00:00
-    Task 5;"";00:00:00
+    2020-09-27 18:44:44
+    Task 1 00:23:41 "meetings"
+    Task 2 00:15:17 "JIRA-3460"
+    Task 3 00:00:00 ""
+    Task 4 00:04:26 "jenkins pipeline"
+    Task 5 00:00:00 ""
     ------------
+
 
 
 The program keeps track of the cumulative time any given task was active. Thus, task switches are easily possible. Only one task can be active at a time.
@@ -60,3 +61,18 @@ This is a list of features that will be implemented in the future:
 *  more than one action possible per call
 *  alternative way to set name [DONE]
 *  first process should also do what it was told and not 'just' daemonize
+
+### Example Configuration and Usage
+
+To make best use of this program, start it at boot.  
+Set keyboard commands to call the program with specific arguments, e.g.:  
+
+| key     | cmd              |
+|---------|------------------|
+| mod+F1  | timeKeeper -t1 -s|
+| mod+F2  | timekeeper -t2 -s|
+| ...     | ...              |
+| mod+^   | timeKeeper -v    |
+| mod+l   | timekeeper -e; lockscreen \*|
+
+\* useful to stop time tracking whenever the screen is locked
