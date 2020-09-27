@@ -30,5 +30,6 @@ int   exitIpc();
 int   waitForMsg(struct msg *message);
 int   sendMsg(struct msg message);
 int   handleMsg(struct msg message);
+int   getTaskName(char *buf, size_t n);
 
 #endif

@@ -41,6 +41,16 @@ int switchToTask(int idx) {
   return ret;
 }
 
+int taskHasName(int idx) {
+
+  if (--idx < 0) {
+    return 0;
+  }
+
+  return (strlen(g_tasks.task[idx].name) > 0);
+
+}
+
 int setTaskName(int idx, const char *name) {
   if (--idx < 0) return 0;
 
@@ -119,7 +129,7 @@ void getTaskString(task_t *t, char *buf, size_t n) {
   int h = (int)t->cum / 3600;
   int m = ((int)t->cum % 3600) / 60;
   int s = (int)t->cum % 60;
-  snprintf(buf, n, "\nTask %d %02d:%02d:%02d \"%s\" %s", t->id, h, m, s, t->name, active);
+  snprintf(buf, n, "\nTask %d %02d:%02d:%02d '%s' %s", t->id, h, m, s, t->name, active);
 
   if (restart) {
     startTask(t->id);

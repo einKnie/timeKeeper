@@ -98,6 +98,13 @@ int handleMsg(struct msg message) {
 
   switch(message.type) {
     case EStartCtr:
+      if (! taskHasName(message.idx)) {
+        char in[MAX_TEXT] = "\0";
+        if (! getTaskName(in, MAX_TEXT)) {
+          break;
+        }
+        setTaskName(message.idx, in);
+      }
       switchToTask(message.idx);
       break;
     case EEndCtr:
@@ -122,6 +129,19 @@ int handleMsg(struct msg message) {
       return 0;
   }
 
+  return 1;
+}
+
+int getTaskName(char *buf, size_t n) {
+  FILE *out = popen("zenity --entry --text=\"Task name\"", "r");
+  fgets(buf, n, out);
+  if (strlen(buf) < 1) {
+    printf("aborted\n");
+    system("zenity --info --no-wrap --text=\"Aborted.\nNot starting task.\"");
+    return 0;
+  }
+  buf[strlen(buf) -1] = '\0';
+  printf("Got task name: %s\n", buf);
   return 1;
 }
 

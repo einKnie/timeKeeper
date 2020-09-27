@@ -27,6 +27,7 @@ int initTasks();
 /// @note: any previously active task is stopped
 int switchToTask(int idx);
 
+int taskHasName(int idx);
 int setTaskName(int idx, const char *name);
 
 /// Return the cumulative time from task \a idx
