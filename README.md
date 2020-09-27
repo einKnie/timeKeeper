@@ -14,8 +14,10 @@ Keep track of how much time you spend on a number of tasks.
 |-t \<no\>   | specify a task (numbers range from 1 to 5 \*)  
 |-n \<str\>  | set a name for the specified task  
 |-s          | start the specified task
+|-e          | stop all tasks
 |-v          | show a notification with information on tasks
 |-x          | write current task data to file \*\*
+|-q          | quit the daemon process (also writes data to file)
 |-h          | print help
 
 \* number can be increased in _timeKeeper.h_  
@@ -54,5 +56,4 @@ Stopping the daemon process will also halt any time keeping. But current data is
 
 This is a list of features that will be implemented in the future:  
 *  actual daemonisation
-*  halt all tasks (e.g. when on a break)
 *  tbd
