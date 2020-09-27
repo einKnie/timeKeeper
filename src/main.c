@@ -22,12 +22,11 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-
 #include <linux/limits.h>
 #include <signal.h>
 
 #include "procMgr.h"
-
+#include "ipcCtl.h"
 
 void cleanup(void);
 void sigHdl(const int signum);
@@ -59,7 +58,7 @@ int main(int argc, char **argv) {
     }
   }
 
-  // check pidfile
+  // get pidfile path
   char *user = NULL;
   if ((user = getlogin()) == NULL) {
     printf("error: cannot determine current user\n");
@@ -84,20 +83,30 @@ int main(int argc, char **argv) {
     // this is the new daemon
     g_isDaemon = 1;
 
-    while (1) {
-      sleep(1);
-    }
-
   } else {
     printf("got pid of daemon: %d\n", pid);
   }
 
-  // if yes:
-  // ipc to daemon process with whatever parameter was given
+  initIpc(g_pidfile, g_isDaemon);
 
-  // if no:
-  // do whatever parameter was given, and keep running as daemon
-  // i.e. wait for ipc from now on
+  if (g_isDaemon) {
+    // daemon loop
+    struct msg message;
+
+    while (1) {
+      // daemon loop: wait for ipc here
+      sleep(1);
+      waitForMsg(&message);
+    }
+  } else {
+    // client stuff
+    struct msg message;
+    message.type = EStartCtr;
+    message.idx  = 1;
+    sprintf(message.text, "Test text");
+
+    sendMsg(message);
+  }
 
   return 0;
 }
@@ -111,6 +120,7 @@ void sigHdl(const int signum) {
 void cleanup(void) {
   printf("Cleaning up...\n");
   fflush(stdout);
+  exitIpc(g_isDaemon);
   if (g_isDaemon) {
     if (! cleanupPidFile(g_pidfile)) {
       printf("error: Failed to remove pid file at: %s\n", g_pidfile);
