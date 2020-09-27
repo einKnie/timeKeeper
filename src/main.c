@@ -30,6 +30,7 @@
 
 void cleanup(void);
 void sigHdl(const int signum);
+void printHelp();
 
 static const char procname[] = "timeKeeper";
 
@@ -47,13 +48,29 @@ int main(int argc, char **argv) {
   atexit(cleanup);
 
   // parse params
+  int type = ENone;
+  int idx  = 0;
+  char text[MAX_TEXT] = "\0";
+
   int opt;
   while ((opt = getopt(argc, argv, "t:s:xh")) != -1) {
     switch(opt) {
-      case 't': break;
-      case 's': break;
-      case 'x': break;
-      case 'h': break;
+      case 't':
+        type = EStartCtr;
+        idx = atoi(optarg);
+        break;
+      case 's':
+        type = EStopCtr;
+        idx = atoi(optarg);
+        break;
+      case 'x':
+        type = ESave;
+        idx = 0;
+        break;
+      case 'h':
+        printHelp();
+        exit(0);
+        break;
       default: printf("Error: invalid parameter: %c\n", opt); exit(1);
     }
   }
@@ -71,17 +88,19 @@ int main(int argc, char **argv) {
   // check if a daemon is already running
   int pid = checkPidFile(g_pidfile);
   if (pid < 0) {
+
     printf("Error: Failed to read pidfile\n");
     exit(1);
+
   } else if (pid == 0) {
+
     printf("no daemon running!\n");
+    // this is the new daemon
+    g_isDaemon = 1;
     if (! createPidFile(g_pidfile)) {
       printf("error: failed to create pid file\n");
       exit(1);
     }
-
-    // this is the new daemon
-    g_isDaemon = 1;
 
   } else {
     printf("got pid of daemon: %d\n", pid);
@@ -101,9 +120,9 @@ int main(int argc, char **argv) {
   } else {
     // client stuff
     struct msg message;
-    message.type = EStartCtr;
-    message.idx  = 1;
-    sprintf(message.text, "Test text");
+    message.type = type;
+    message.idx  = idx;
+    sprintf(message.text, text);
 
     sendMsg(message);
   }
@@ -119,11 +138,18 @@ void sigHdl(const int signum) {
 
 void cleanup(void) {
   printf("Cleaning up...\n");
-  fflush(stdout);
-  exitIpc(g_isDaemon);
   if (g_isDaemon) {
+    if (! exitIpc()) {
+      printf("error: Failed to remove message queue\n");
+    }
     if (! cleanupPidFile(g_pidfile)) {
       printf("error: Failed to remove pid file at: %s\n", g_pidfile);
     }
   }
+}
+
+// ----- help -----
+void printHelp() {
+  printf("timeKeeper v.%d\n", VERSION);
+  printf("tbd.\n");
 }

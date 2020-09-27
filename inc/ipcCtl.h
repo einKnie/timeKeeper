@@ -4,8 +4,7 @@
 #include "timeKeeper.h"
 #include <sys/ipc.h>
 
-
-enum {
+enum opType {
   ENone = 0,
   EStartCtr,
   EStopCtr,
@@ -25,7 +24,7 @@ struct msg {
 
 key_t initKey(const char *keyfile);
 int initIpc(const char *keyfile, int daemon);
-int exitIpc(int daemon);
+int exitIpc();
 int waitForMsg(struct msg *message);
 int sendMsg(struct msg message);
 int handleMsg(struct msg message);

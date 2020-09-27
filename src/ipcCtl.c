@@ -1,9 +1,10 @@
-#include "ipcCtl.h"
 #include <sys/msg.h>
 
 #include <errno.h>
 #include <stdio.h>
 #include <string.h>
+
+#include "ipcCtl.h"
 
 struct msgQueue {
   key_t key;
@@ -42,22 +43,19 @@ int initIpc(const char *keyfile, int daemon) {
   return g_initQueue;
 }
 
-int exitIpc(int daemon) {
+int exitIpc() {
   if (! g_initQueue) {
     printf("queue not initialized. doing nothing...\n");
     return 1;
   }
 
-  if (daemon && g_initQueue) {
-    // remove queue altogether
-    if (msgctl(msgQueue.id, IPC_RMID, NULL) < 0) {
-      printf("failed to remove msgqueue: %s\n", strerror(errno));
-      return 0;
-    }
-  } else {
-    // just close this handle (do we even need to do anything here?)
+  // remove queue
+  if (msgctl(msgQueue.id, IPC_RMID, NULL) < 0) {
+    printf("failed to remove msgqueue: %s\n", strerror(errno));
+    return 0;
   }
 
+  printf("remove message queue\n");
   return 1;
 }
 
