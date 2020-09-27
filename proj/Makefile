@@ -6,7 +6,7 @@ OBJ_DIR     = $(TARGET_DIR)/obj
 TARGET      = timeKeeper
 
 CXX = gcc
-CFLAGS = -Wall -Werror -g -I$(INC_DIR)
+CFLAGS = -Wall -Wextra -Werror -pedantic-errors -g -I$(INC_DIR)
 
 SRCS       := $(wildcard $(SRC_DIR)/*.c)
 OBJ         = $(patsubst $(SRC_DIR)/%.c, $(OBJ_DIR)/%.o, $(SRCS))
