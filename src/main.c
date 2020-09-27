@@ -111,23 +111,24 @@ int main(int argc, char **argv) {
   if ((pid = checkPidFile(g_pidfile)) < 0) {
     printf("Error: Failed to read pidfile\n");
     exit(1);
-  } else if (pid == 0) {
-    printf("no daemon running!\n");
+  }
+
+  if (pid != 0) {
+    printf("got pid of daemon: %d\n", pid);
+  } else {
+    printf("no daemon found, becoming the new daemon!\n");
     daemonize();
-    // this is the new daemon
+    // we are a daemon now
     g_isDaemon = 1;
     if (! createPidFile(g_pidfile)) {
       printf("error: failed to create pid file\n");
       exit(1);
     }
-  } else {
-    printf("got pid of daemon: %d\n", pid);
   }
 
   initIpc(g_pidfile, g_isDaemon);
 
   if (g_isDaemon) {
-    // daemon loop
     initTasks();
     struct msg message;
 
@@ -169,7 +170,11 @@ void cleanup(void) {
       printf("error: Failed to remove pid file at: %s\n", g_pidfile);
     }
   }
-  printf("Exiting\n");
+
+  if (g_logfd > -1) {
+    printf("process %d exiting\n", getpid());
+    close(g_logfd);
+  }
 }
 
 // ----- help -----
@@ -189,4 +194,5 @@ void printHelp() {
   printf("Note: -s and -n require the task being set with -t also\n");
   printf("Note: <no> must be an integer in range %d to %d\n", MIN_IDX, MAX_IDX);
   printf("Note: data is written to file '.%s.dat' in caller's home\n", procname);
+  printf("Last note: A logfile of the daemon process is kept at '/tmp/timeKeeper.log'\n");
 }

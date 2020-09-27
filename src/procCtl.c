@@ -86,9 +86,7 @@ int daemonize() {
   if ((pid = fork()) < 0) {
     printf("Error: failed to fork\n");
     exit(1);
-  }
-
-  if (pid > 0) {
+  } else if (pid > 0) {
     printf("parent terminating\n");
     exit(0);
   }
@@ -101,10 +99,10 @@ int daemonize() {
   signal(SIGHUP, SIG_IGN);
 
   if ((pid = fork()) < 0) {
+    printf("Error: failed to fork\n");
     exit(1);
-  }
-
-  if (pid > 0) {
+  } else if (pid > 0) {
+    printf("middleman terminating\n");
     exit(0);
   }
 
