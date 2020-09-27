@@ -25,8 +25,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <signal.h>
-
-#include "procMgr.h"
+#include "procCtl.h"
 #include "ipcCtl.h"
 #include "taskCtl.h"
 
@@ -63,13 +62,16 @@ int main(int argc, char **argv) {
   // then have other options, like -n <name>, -s (start),
 
   int opt;
-  while ((opt = getopt(argc, argv, "t:n:svxh")) != -1) {
+  while ((opt = getopt(argc, argv, "t:n:sevxqh")) != -1) {
     switch(opt) {
       case 't':
         idx = atoi(optarg);
         break;
       case 's':
         type = EStartCtr;
+        break;
+      case 'e':
+        type = EEndCtr;
         break;
       case 'v':
         type = EShowInfo;
@@ -81,6 +83,9 @@ int main(int argc, char **argv) {
       case 'x':
         type = ESave;
         idx = 0;
+        break;
+      case 'q':
+        type = EQuit;
         break;
       case 'h':
         printHelp();
@@ -196,8 +201,10 @@ void printHelp() {
   printf("-t <no> \t... select operation for task <no>\n");
   printf("-n <str>\t... set name <str> for selected task\n");
   printf("-s      \t... start counter for selected task\n");
+  printf("-e      \t... stop any running task counter\n");
   printf("-v      \t... show current task data as notification\n");
-  printf("-x      \t... write data to file and stop daemon\n");
+  printf("-x      \t... write data to file\n");
+  printf("-q      \t... stop daemon (writes data to file automatically)\n");
   printf("-h      \t... print this help message and exit\n");
   printf("\n");
   printf("Note: <no> must be an integer in range %d to %d\n", MIN_IDX, MAX_IDX);

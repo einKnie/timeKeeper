@@ -13,10 +13,9 @@ typedef struct task {
 } task_t; ///< data of a single task
 
 typedef struct taskData {
-  int    active;          ///< index of active task
+  int    active;          ///< id of active task
   task_t task[MAX_IDX];   ///< tasks
 } taskData_t; ///< collective task data
-
 
 
 /// Initialize task structs
@@ -39,9 +38,13 @@ int getTaskTime(int idx);
 /// @return 1 on success, 0 on failure
 int storeTaskData(int idx, const char *file);
 
+/// Show a notification containing the current task data
 int showTaskData();
 
 /// Write task data to \a buf
+/// @param [in] t task
+/// @param [in,out] buf
+/// @param [in] n size of buffer
 void getTaskString(task_t *t, char *buf, size_t n);
 
 /// Stop a running task
@@ -49,12 +52,5 @@ int stopTask(int idx);
 
 // Start a task
 int startTask(int idx);
-
-
-// start a task
-// switch task
-// end a task (?)
-// save task data
-// get current cum of task
 
 #endif

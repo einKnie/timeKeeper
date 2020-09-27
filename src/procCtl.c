@@ -1,10 +1,10 @@
-#include "procMgr.h"
 #include <errno.h>
 #include <stdio.h>
 #include <fcntl.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include "procCtl.h"
 
 /// Check if a given pidfile exists
 /// @return 0 if no file exists, -1 on error, and file content ( == pid of daemon) on success
