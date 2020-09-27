@@ -5,4 +5,7 @@ int checkPidFile(const char *pidfile);
 int createPidFile(const char *pidfile);
 int cleanupPidFile(const char *pidfile);
 
+int daemonize();
+int rerouteLog();
+
 #endif

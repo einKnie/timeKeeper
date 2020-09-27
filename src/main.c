@@ -1,30 +1,16 @@
-/*
- * TimeKeeper v0.1
- *  base program checks if another process is running
- *  if not: it forks itself
- *  if yes: sends a message with cmd to daemon
- *
- *
-*/
-
-// params:
-// -h help
-// -t <int> ... start tracking task <int>
-// -s <int> ... stop tracking task <int>
-// -x ... stop
-
-// daemonisation: write own pid to pid file (/var/run/bla.pid)
-// - if pid file exists: a daemon is running
-// - if pid file does not exist: become daemon and write own pid to file
-
-
-// TODO: actual daemonisation!
-
+/*  _   _                _  __
+ * | |_(_)_ __ ___   ___| |/ /___  ___ _ __   ___ _ __
+ * | __| | '_ ` _ \ / _ \ ' // _ \/ _ \ '_ \ / _ \ '__|
+ * | |_| | | | | | |  __/ . \  __/  __/ |_) |  __/ |
+ *  \__|_|_| |_| |_|\___|_|\_\___|\___| .__/ \___|_|
+ *   <einKnie@gmx.at>                 |_|
+ */
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 #include <signal.h>
+#include "timeKeeper.h"
 #include "procCtl.h"
 #include "ipcCtl.h"
 #include "taskCtl.h"
@@ -38,12 +24,11 @@ static const char procname[] = "timeKeeper";
 // declared as extern in timeKeeper.h
 char g_pidfile[PATH_MAX] = "\0";
 char g_savefile[PATH_MAX] = "\0";
+int  g_logfd = -1;
 
 int  g_isDaemon = 0;
 
 int main(int argc, char **argv) {
-
-  system("notify-send -t 5 Hello");
 
   // set exit handlers
   struct sigaction act;
@@ -128,6 +113,7 @@ int main(int argc, char **argv) {
     exit(1);
   } else if (pid == 0) {
     printf("no daemon running!\n");
+    daemonize();
     // this is the new daemon
     g_isDaemon = 1;
     if (! createPidFile(g_pidfile)) {
@@ -183,6 +169,7 @@ void cleanup(void) {
       printf("error: Failed to remove pid file at: %s\n", g_pidfile);
     }
   }
+  printf("Exiting\n");
 }
 
 // ----- help -----
