@@ -18,6 +18,8 @@
 // - if pid file does not exist: become daemon and write own pid to file
 
 
+// TODO: actual daemonisation!
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

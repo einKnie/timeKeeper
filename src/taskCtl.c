@@ -1,6 +1,7 @@
 #include "taskCtl.h"
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 #include <fcntl.h>
@@ -47,6 +48,23 @@ int setTaskName(int idx, const char *name) {
   return 1;
 }
 
+int showTaskData() {
+  char buf[MAX_TEXT*11];
+  char outbuf[MAX_TEXT*12];
+  size_t offs = 0;
+
+  for (int i = 0; i < MAX_IDX; i++) {
+    task_t *t = &(g_tasks.task[i]);
+    getTaskString(t, buf + offs, MAX_TEXT * 2);
+    offs = strlen(buf);
+  }
+
+  snprintf(outbuf, sizeof(outbuf), "notify-send -t 0 \"Tasks\" \"%s\"", buf);
+  system(outbuf);
+
+  return 1;
+}
+
 int storeTaskData(int idx, const char *file) {
   int ret = 0;
 
@@ -61,7 +79,7 @@ int storeTaskData(int idx, const char *file) {
   }
 
   time_t now;
-  char buf[MAX_TEXT];
+  char buf[MAX_TEXT*2];
   struct tm *tm_info;
 
   now = time(NULL);
@@ -72,11 +90,14 @@ int storeTaskData(int idx, const char *file) {
   if (idx > 0) {
     idx -= 1;
     task_t *t = &(g_tasks.task[idx]);
-    writeTask(fd, t);
+    getTaskString(t, buf, sizeof(buf));
+    write(fd, buf, strlen(buf));
   } else {
     for(int i = 0; i < MAX_IDX; i++) {
       task_t *t = &(g_tasks.task[i]);
-      writeTask(fd, t);
+      // writeTask(fd, t);
+      getTaskString(t, buf, sizeof(buf));
+      write(fd, buf, strlen(buf));
     }
   }
 
@@ -85,10 +106,9 @@ int storeTaskData(int idx, const char *file) {
   return ret;
 }
 
-void writeTask(int fd, task_t *t) {
+void getTaskString(task_t *t, char *buf, size_t n) {
   int restart = 0;
   char active[4] = "";
-  char buf[MAX_TEXT*2];
 
   if (t->id == g_tasks.active) {
     restart = 1;
@@ -99,9 +119,8 @@ void writeTask(int fd, task_t *t) {
   int h = (int)t->cum / 3600;
   int m = ((int)t->cum % 3600) / 60;
   int s = (int)t->cum % 60;
-  snprintf(buf, sizeof(buf), "\nTask %d;\"%s\";%02d:%02d:%02d %s", t->id, t->name, h, m, s, active);
+  snprintf(buf, n, "\nTask %d %02d:%02d:%02d \"%s\" %s", t->id, h, m, s, t->name, active);
 
-  write(fd, buf, strlen(buf));
   if (restart) {
     startTask(t->id);
   }

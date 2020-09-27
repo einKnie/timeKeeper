@@ -103,6 +103,7 @@ int handleMsg(struct msg message) {
       break;
     case EShowInfo:
       printf("show info notification\n");
+      showTaskData();
       break;
     case ESave:
       storeTaskData(message.idx, g_savefile);

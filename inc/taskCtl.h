@@ -39,7 +39,10 @@ int getTaskTime(int idx);
 /// @return 1 on success, 0 on failure
 int storeTaskData(int idx, const char *file);
 
-void writeTask(int fd, task_t *t);
+int showTaskData();
+
+/// Write task data to \a buf
+void getTaskString(task_t *t, char *buf, size_t n);
 
 /// Stop a running task
 int stopTask(int idx);
