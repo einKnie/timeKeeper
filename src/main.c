@@ -54,12 +54,9 @@ int main(int argc, char **argv) {
   atexit(cleanup);
 
   // parse params
-  int type = ENone;
-  int idx  = 0;
+  int  type = ENone;
+  int  idx  = 0;
   char text[MAX_TEXT] = "\0";
-
-  // maybe have -t <no> as a general switch to signify task
-  // then have other options, like -n <name>, -s (start),
 
   int opt;
   while ((opt = getopt(argc, argv, "t:n:sevxqh")) != -1) {
@@ -125,14 +122,11 @@ int main(int argc, char **argv) {
   printf("Checking pidfile at %s\n", g_pidfile);
 
   // check if a daemon is already running
-  int pid = checkPidFile(g_pidfile);
-  if (pid < 0) {
-
+  int pid = -1;
+  if ((pid = checkPidFile(g_pidfile)) < 0) {
     printf("Error: Failed to read pidfile\n");
     exit(1);
-
   } else if (pid == 0) {
-
     printf("no daemon running!\n");
     // this is the new daemon
     g_isDaemon = 1;
@@ -140,7 +134,6 @@ int main(int argc, char **argv) {
       printf("error: failed to create pid file\n");
       exit(1);
     }
-
   } else {
     printf("got pid of daemon: %d\n", pid);
   }
@@ -154,10 +147,10 @@ int main(int argc, char **argv) {
 
     while (1) {
       // daemon loop: wait for ipc here
-      sleep(1);
       waitForMsg(&message);
       handleMsg(message);
     }
+
   } else {
     // client stuff
     struct msg message;
@@ -178,7 +171,6 @@ void sigHdl(const int signum) {
 }
 
 void cleanup(void) {
-  printf("Cleaning up...\n");
   if (g_isDaemon) {
     // cleanup tasks
     switchToTask(0);
@@ -197,15 +189,17 @@ void cleanup(void) {
 
 void printHelp() {
   printf("timeKeeper v.%d\n", VERSION);
-  printf("\ttimeKeeper [-t <no> -s -x  -v -h]\n");
-  printf("-t <no> \t... select operation for task <no>\n");
+  printf("\ttimeKeeper [-t <no> -n -s -e -v -x -q -h]\n");
+  printf("-t <no> \t... select a task <no>\n");
   printf("-n <str>\t... set name <str> for selected task\n");
   printf("-s      \t... start counter for selected task\n");
   printf("-e      \t... stop any running task counter\n");
   printf("-v      \t... show current task data as notification\n");
-  printf("-x      \t... write data to file\n");
+  printf("-x      \t... write current task data to file\n");
   printf("-q      \t... stop daemon (writes data to file automatically)\n");
   printf("-h      \t... print this help message and exit\n");
   printf("\n");
+  printf("Note: -s and -n require the task being set with -t also\n");
   printf("Note: <no> must be an integer in range %d to %d\n", MIN_IDX, MAX_IDX);
+  printf("Note: data is written to file '.%s.dat' in caller's home\n", procname);
 }
