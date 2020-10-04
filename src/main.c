@@ -133,7 +133,7 @@ int main(int argc, char **argv) {
     }
   }
 
-  initIpc(g_pidfile, g_isDaemon);
+  initIpc(g_isDaemon);
 
   if (g_isDaemon) {
     notify("Daemon running", 5);

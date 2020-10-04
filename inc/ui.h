@@ -11,19 +11,19 @@
 #include "timeKeeper.h"
 
 
-/// @brief Send a notification
+/// Send a notification
 /// @param [in] text
 /// @param [in] t notification timeout in seconds [ 0 == no timeout ]
 void notify(const char *text, int t);
 
-/// @brief Get user input
+/// Get user input
 /// @param [in] prompt
 /// @param [in,out] out holds user input after successful call
 /// @param [in] n size of \a out buffer
 /// @return 1 on success, 0 on failure/abort
 int  getInput(const char *prompt, char *out, size_t n);
 
-/// @brief Show a popup
+/// Show a popup
 /// @param [in] text
 void popup(const char *text);
 

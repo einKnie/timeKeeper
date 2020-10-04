@@ -26,7 +26,7 @@ typedef struct taskData {
 
 
 /// Initialize task structs
-int initTasks();
+void initTasks();
 
 /// Switch to task \a idx
 /// @param idx index of next task. if 0, stop all tasks
@@ -34,12 +34,16 @@ int initTasks();
 /// @note: any previously active task is stopped
 int switchToTask(int idx);
 
+/// Check if task \a idx has a name
+/// @param [in] idx index of task
+/// @return 0 if no name, 1 if name
 int taskHasName(int idx);
-int setTaskName(int idx, const char *name);
 
-/// Return the cumulative time from task \a idx
-/// @todo: think about this: do we need it?
-int getTaskTime(int idx);
+/// Set a name for task \a idx
+/// @param [in] idx index of task
+/// @param [in] name
+/// @return 0 on failure, 1 on success
+int setTaskName(int idx, const char *name);
 
 /// Write data of task \idx to file
 /// @param idx index of task, if 0, write all tasks

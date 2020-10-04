@@ -16,8 +16,6 @@
 #include "timeKeeper.h"
 #include "procCtl.h"
 
-/// Check if a given pidfile exists
-/// @return 0 if no file exists, -1 on error, pid of daemon on success
 int checkPidFile(const char *pidfile) {
   int ret = 0;
   int fd = -1;
@@ -42,8 +40,6 @@ int checkPidFile(const char *pidfile) {
   return ret;
 }
 
-/// Create a pidfile
-/// @return 0 on failure, 1 on success
 int createPidFile(const char *pidfile) {
   int  ret     = 0;
   int  fd      = -1;
@@ -68,8 +64,6 @@ int createPidFile(const char *pidfile) {
   return ret;
 }
 
-/// Remove a pidfile
-/// @return 0 on failure, 1 on success
 int cleanupPidFile(const char *pidfile) {
   if (remove(pidfile) < 0) {
     printf("error: failed to remove pid file\n");
@@ -80,7 +74,7 @@ int cleanupPidFile(const char *pidfile) {
   }
 }
 
-int daemonize() {
+void daemonize() {
   pid_t pid;
 
   if ((pid = fork()) < 0) {
@@ -114,7 +108,6 @@ int daemonize() {
     }
   }
 
-  return 1;
 }
 
 int rerouteLog() {

@@ -17,8 +17,7 @@
 taskData_t g_tasks;
 int        g_taskInit = 0;
 
-int initTasks() {
-  int ret = 0;
+void initTasks() {
 
   for (int i = 0; i < MAX_IDX; i++) {
     g_tasks.task[i].id      = (i + 1);
@@ -29,7 +28,6 @@ int initTasks() {
   }
 
   g_taskInit = 1;
-  return ret;
 }
 
 int switchToTask(int idx) {
@@ -79,7 +77,7 @@ int showTaskData() {
 }
 
 int storeTaskData(int idx, const char *file) {
-  int ret = 0;
+  int ret = 1;
 
   // open storage file in append mode
   // first line: current date/time
@@ -98,7 +96,10 @@ int storeTaskData(int idx, const char *file) {
   now = time(NULL);
   tm_info = localtime(&now);
   strftime(buf, sizeof(buf), "%Y-%m-%d %H:%M:%S", tm_info);
-  write(fd, buf, strlen(buf));
+  if (write(fd, buf, strlen(buf)) < (int)strlen(buf)) {
+    printf("error: Failed to write to savefile\n");
+    ret = 0;
+  }
 
   if (idx > 0) {
     idx -= 1;
@@ -109,11 +110,18 @@ int storeTaskData(int idx, const char *file) {
     for(int i = 0; i < MAX_IDX; i++) {
       task_t *t = &(g_tasks.task[i]);
       getTaskString(t, buf, sizeof(buf));
-      write(fd, buf, strlen(buf));
+      if (write(fd, buf, strlen(buf)) < (int)strlen(buf)) {
+        printf("error: Failed to write to savefile\n");
+        ret = 0;
+      }
     }
   }
 
-  write(fd, "\n------------\n", 14); // todo: improve this
+  snprintf(buf, sizeof(buf), "\n-------------------\n");
+  if (write(fd, buf, strlen(buf)) < (int)strlen(buf)) {
+    printf("error: Failed to write to savefile\n");
+    ret = 0;
+  }
   close(fd);
   return ret;
 }

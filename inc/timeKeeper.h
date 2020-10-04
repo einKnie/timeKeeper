@@ -13,14 +13,14 @@
 #define VERSION 1
 #define MAX_TEXT 100
 
-#define MIN_IDX 1
-#define MAX_IDX 5
-#define PROCNAME "timeKeeper"
+#define MIN_IDX 1                 ///< min task index
+#define MAX_IDX 5                 ///< max task index [ increase this to add more tasks ]
+#define PROCNAME "timeKeeper"     ///< name used for all files (pid, save, log)
 
-extern char g_pidfile[PATH_MAX];
-extern char g_savefile[PATH_MAX];
-extern char g_logfile[PATH_MAX];
+extern char g_pidfile[PATH_MAX];  ///< pidfile path
+extern char g_savefile[PATH_MAX]; ///< savefile path
+extern char g_logfile[PATH_MAX];  ///< logfile path
 
-extern int  g_logfd;
+extern int  g_logfd;              ///< logfile file descriptor
 
 #endif

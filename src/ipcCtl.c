@@ -17,11 +17,10 @@
 struct msgQueue {
   key_t key;
   int   id;
-} msgQueue;
-
+} g_msgQueue;
 int g_initQueue = 0;
 
-int initIpc(const char *keyfile, int daemon) {
+int initIpc(int daemon) {
 
   if (g_initQueue) {
     printf("queue already initialized. doing nothing\n");
@@ -29,7 +28,7 @@ int initIpc(const char *keyfile, int daemon) {
   }
 
   int   msgid = 0;
-  key_t key   = initKey(keyfile);
+  key_t key   = ftok(g_pidfile, VERSION);
 
   if (daemon) {
     // init ipc as listener
@@ -43,8 +42,8 @@ int initIpc(const char *keyfile, int daemon) {
     printf("Failed to open msgqueue: %s\n", strerror(errno));
   } else {
     printf("Message queue created\n");
-    msgQueue.key = key;
-    msgQueue.id  = msgid;
+    g_msgQueue.key = key;
+    g_msgQueue.id  = msgid;
     g_initQueue = 1;
   }
 
@@ -58,12 +57,12 @@ int exitIpc() {
   }
 
   // remove queue
-  if (msgctl(msgQueue.id, IPC_RMID, NULL) < 0) {
+  if (msgctl(g_msgQueue.id, IPC_RMID, NULL) < 0) {
     printf("failed to remove msgqueue: %s\n", strerror(errno));
     return 0;
   }
 
-  printf("remove message queue\n");
+  printf("removed message queue\n");
   return 1;
 }
 
@@ -74,7 +73,7 @@ int waitForMsg(struct msg *message) {
     return 0;
   }
 
-  if ((msgrcv(msgQueue.id, message, sizeof(*message), 0, 0)) < 0) {
+  if ((msgrcv(g_msgQueue.id, message, sizeof(*message), 0, 0)) < 0) {
     printf("failed to receive message: %s\n", strerror(errno));
     return 0;
   } else {
@@ -92,7 +91,7 @@ int sendMsg(struct msg message) {
     return 0;
   }
 
-  if ((msgsnd(msgQueue.id, &message, sizeof(message), 0)) < 0) {
+  if ((msgsnd(g_msgQueue.id, &message, sizeof(message), 0)) < 0) {
     printf("failed to send message: %s\n", strerror(errno));
     return 0;
   } else {
@@ -139,8 +138,4 @@ int handleMsg(struct msg message) {
   }
 
   return 1;
-}
-
-key_t initKey(const char *keyfile) {
-  return(ftok(keyfile, VERSION));
 }

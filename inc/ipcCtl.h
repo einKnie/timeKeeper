@@ -31,11 +31,28 @@ struct msg {
   char text[100];
 };
 
-key_t initKey(const char *keyfile);
-int   initIpc(const char *keyfile, int daemon);
-int   exitIpc();
-int   waitForMsg(struct msg *message);
-int   sendMsg(struct msg message);
-int   handleMsg(struct msg message);
+/// Initialize msgQueue
+/// @param [in] daemon 1 if daemon process, 0 if client
+/// @return 0 on error, 1 on success
+int initIpc(int daemon);
+
+/// Close && cleanup msgQueue
+/// @return 0 on error, 1 on success
+int exitIpc();
+
+/// Wait for a message via msgQueue
+/// @param [in,out] message holds received message after successful call
+/// @return 0 on error, 1 on success
+int waitForMsg(struct msg *message);
+
+/// Send a message via msgQueue
+/// @param [in] message
+/// @return 0 on error, 1 on success
+int sendMsg(struct msg message);
+
+/// Handle a message
+/// @param [in] message
+/// @return 0 on error, 1 on success
+int handleMsg(struct msg message);
 
 #endif
