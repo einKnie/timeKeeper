@@ -1,10 +1,15 @@
 # timeKeeper
 
-_This is a work in progress. The codebase as well as this README will be cleaned up once I'm done._
+~~_This is a work in progress. The codebase as well as this README will be cleaned up once I'm done._~~
+
+Version 1.0
 
 ## Functionality
-[LINUX ONLY]  
-Keep track of how much time you spend on a number of tasks.
+**[LINUX ONLY]**  
+
+Keep track of how much time you spend on a number of tasks.  
+The program keeps track of the cumulative time any given task was active. Thus, task switches are easily possible. Only one task can be active at a time.  
+The cumulative task times are saved automatically upon exit.
 
 
 ### Usage
@@ -29,7 +34,7 @@ Keep track of how much time you spend on a number of tasks.
     timeKeeper -t1 -n "meetings" # set name of task1 to 'meetings'
     timeKeeper -t1 -s            # start task1
     ...
-    timeKeeper -t3 -s            # stop running task and start task3
+    timeKeeper -t4 -s            # stop running task and start task3
     ...
     timeKeeper -x                # write data of all tasks to file
 
@@ -47,30 +52,32 @@ Keep track of how much time you spend on a number of tasks.
 
 
 
-The program keeps track of the cumulative time any given task was active. Thus, task switches are easily possible. Only one task can be active at a time.
+
 
 ### Implementation specifics
 
-The first running timeKeeper process will daemonize itself (wip) and keep running in the background. Any new timeKeeper process will check if the daemon is running and simply send the command via IPC to the daemon process.  
-Stopping the daemon process will also halt any time keeping. But current data is written to file upon exit, so nothing will be lost.
+The first running timeKeeper process will daemonize itself and keep running in the background. Any new timeKeeper process will check if the daemon is running and simply send the command via IPC to the daemon process.  
+Stopping the daemon process will also halt any time keeping. But current data is written to file upon exit, so nothing will be lost.  
+Log output from the daemon can be found in _/tmp/timeKeeper.log_.
 
 ### TODO
 
 This is a list of features that will be implemented in the future:  
-*  more than one action possible per call
-*  first process should also do what it was told and not 'just' daemonize
+*  more than one action possible per call  
+*  possibility to resume last active task after record keeping has been disabled with _-e_
 
 ### Example Configuration and Usage
 
-To make best use of this program, start it at boot.  
-Set keyboard commands to call the program with specific arguments, e.g.:  
+ 
+Configure keyboard commands to call the program with specific arguments, e.g.:  
 
 | key     | cmd              |
 |---------|------------------|
 | mod+F1  | timeKeeper -t1 -s|
-| mod+F2  | timekeeper -t2 -s|
+| mod+F2  | timeKeeper -t2 -s|
 | ...     | ...              |
 | mod+^   | timeKeeper -v    |
-| mod+l   | timekeeper -e; lockscreen \*|
+| mod+l   | timeKeeper -e; lockscreen \*|
+| mod+esc | timeKeeper -q    |
 
 \* useful to stop time tracking whenever the screen is locked
