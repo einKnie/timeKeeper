@@ -59,6 +59,12 @@ int showTaskData();
 /// @param [in] n size of buffer
 void getTaskString(task_t *t, char *buf, size_t n);
 
+/// Return the cumulative time spent on all tasks
+/// @param [in,out] buf holds stringified time after successful call
+/// @param [in] n size of \a buf
+/// @returns cumulative time in seconds
+int getCumTaskTime(char *buf, size_t n);
+
 /// Stop a running task
 int stopTask(int idx);
 

@@ -72,6 +72,8 @@ int showTaskData() {
     offs = strlen(buf);
   }
 
+  getCumTaskTime(buf + offs, MAX_TEXT);
+
   notify(buf, 0);
   return 1;
 }
@@ -117,6 +119,12 @@ int storeTaskData(int idx, const char *file) {
     }
   }
 
+  getCumTaskTime(buf, sizeof(buf));
+  if (write(fd, buf, strlen(buf)) < (int)strlen(buf)) {
+    printf("error: Failed to write to savefile\n");
+    ret = 0;
+  }
+
   snprintf(buf, sizeof(buf), "\n-------------------\n");
   if (write(fd, buf, strlen(buf)) < (int)strlen(buf)) {
     printf("error: Failed to write to savefile\n");
@@ -145,6 +153,32 @@ void getTaskString(task_t *t, char *buf, size_t n) {
   if (restart) {
     startTask(t->id);
   }
+}
+
+int getCumTaskTime(char *buf, size_t n) {
+  int cumtime = 0;
+
+  for(int i = 0; i < MAX_IDX; i++) {
+    int restart = 0;
+    task_t *t = &(g_tasks.task[i]);
+
+    if (t->id == g_tasks.active) {
+      restart = 1;
+      stopTask(t->id);
+    }
+
+    cumtime += t->cum;
+
+    if (restart) {
+      startTask(t->id);
+    }
+  }
+
+  int h = cumtime / 3600;
+  int m = (cumtime % 3600) / 60;
+  int s = cumtime % 60;
+  snprintf(buf, n, "\ntotal: %02d:%02d:%02d", h, m, s);
+  return cumtime;
 }
 
 int stopTask(int idx) {
