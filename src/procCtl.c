@@ -17,7 +17,7 @@
 #include "procCtl.h"
 
 /// Check if a given pidfile exists
-/// @return 0 if no file exists, -1 on error, and file content ( == pid of daemon) on success
+/// @return 0 if no file exists, -1 on error, pid of daemon on success
 int checkPidFile(const char *pidfile) {
   int ret = 0;
   int fd = -1;
@@ -121,7 +121,7 @@ int daemonize() {
 
 int rerouteLog() {
   if (g_logfd < 0) {
-    if ((g_logfd = open("/tmp/timeKeeper.log", O_CREAT | O_APPEND | O_WRONLY, 0644)) < 0) {
+    if ((g_logfd = open(g_logfile, O_CREAT | O_APPEND | O_WRONLY, 0644)) < 0) {
       return 1;
     }
 

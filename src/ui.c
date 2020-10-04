@@ -17,11 +17,12 @@ void notify(const char *text, int t) {
   int ret = 0;
   char outbuf[MAX_TEXT*12];
 
-  snprintf(outbuf, sizeof(outbuf), "notify-send -t %d \"%s\" \"%s\"", (t * 1000), PROCNAME, text);
+  snprintf(outbuf, sizeof(outbuf), "notify-send -t %d \"%s\" \"%s\"", \
+          (t * 1000), PROCNAME, text);
   printf("trying to call:\n%s\n", outbuf);
   if ((ret = system(outbuf)) < 0) {
     // TODO: fix this: the call works, why is there an error then?
-    // (possibly related to daemonisation, try using a variant of exec instead of system)
+    // (try using a variant of exec instead of system)
     printf("error: failed to send notification: %d\n", ret);
   }
 

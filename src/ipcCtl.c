@@ -79,7 +79,8 @@ int waitForMsg(struct msg *message) {
     return 0;
   } else {
     printf("received message\n");
-    printf("type: %d\nidx: %d\ntext: %s\n", message->type, message->idx, message->text);
+    printf("type: %d\nidx: %d\ntext: %s\n", \
+            message->type, message->idx, message->text);
     return 1;
   }
 }
