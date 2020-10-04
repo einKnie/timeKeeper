@@ -21,8 +21,9 @@ void sigHdl(const int signum);
 void printHelp();
 
 // declared as extern in timeKeeper.h
-char g_pidfile[PATH_MAX] = "\0";
+char g_pidfile[PATH_MAX]  = "\0";
 char g_savefile[PATH_MAX] = "\0";
+char g_logfile[PATH_MAX]  = "\0";
 int  g_logfd = -1;
 
 int  g_isDaemon = 0;
@@ -101,8 +102,9 @@ int main(int argc, char **argv) {
     exit(1);
   }
 
-  snprintf(g_pidfile, sizeof(g_pidfile), "/home/%s/.%s.pid", user, PROCNAME);
+  snprintf(g_pidfile,  sizeof(g_pidfile),  "/home/%s/.%s.pid", user, PROCNAME);
   snprintf(g_savefile, sizeof(g_savefile), "/home/%s/.%s.dat", user, PROCNAME);
+  snprintf(g_logfile,  sizeof(g_logfile),  "/tmp/%s.log", PROCNAME);
   printf("Checking pidfile at %s\n", g_pidfile);
 
   // check if a daemon is already running
@@ -198,5 +200,5 @@ void printHelp() {
   printf("Note: -s and -n require the task being set with -t also\n");
   printf("Note: <no> must be an integer in range %d to %d\n", MIN_IDX, MAX_IDX);
   printf("Note: data is written to file '.%s.dat' in caller's home\n", PROCNAME);
-  printf("Last note: A logfile of the daemon process is kept at '/tmp/timeKeeper.log'\n");
+  printf("Last note: A logfile of the daemon process is kept at '/tmp/%s.log'\n", PROCNAME);
 }

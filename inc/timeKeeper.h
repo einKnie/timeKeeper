@@ -19,6 +19,7 @@
 
 extern char g_pidfile[PATH_MAX];
 extern char g_savefile[PATH_MAX];
+extern char g_logfile[PATH_MAX];
 
 extern int  g_logfd;
 
