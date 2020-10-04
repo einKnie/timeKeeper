@@ -48,6 +48,7 @@ The cumulative task times are saved automatically upon exit.
     Task 3 00:00:00 ""
     Task 4 00:04:26 "jenkins pipeline"
     Task 5 00:00:00 ""
+    total: 00:41:24
     ------------
 
 
@@ -68,7 +69,7 @@ This is a list of features that will be implemented in the future:
 
 ### Example Configuration and Usage
 
- 
+
 Configure keyboard commands to call the program with specific arguments, e.g.:  
 
 | key     | cmd              |
