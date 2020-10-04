@@ -95,6 +95,12 @@ int main(int argc, char **argv) {
     exit(1);
   }
 
+  // prepare message
+  struct msg message;
+  message.type = type;
+  message.idx  = idx;
+  sprintf(message.text, text);
+
   // get pidfile path
   char *user = NULL;
   if ((user = getlogin()) == NULL) {
@@ -132,7 +138,9 @@ int main(int argc, char **argv) {
   if (g_isDaemon) {
     notify("Daemon running", 5);
     initTasks();
-    struct msg message;
+
+    // in case daemon was started w/ args, process them
+    handleMsg(message);
 
     while (1) {
       // daemon loop: wait for ipc here
@@ -142,12 +150,6 @@ int main(int argc, char **argv) {
     }
 
   } else {
-    // client stuff
-    struct msg message;
-    message.type = type;
-    message.idx  = idx;
-    sprintf(message.text, text);
-
     sendMsg(message);
   }
 
