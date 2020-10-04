@@ -56,7 +56,7 @@ The cumulative task times are saved automatically upon exit.
 
 ### Implementation specifics
 
-The first running timeKeeper process will daemonize itself and keep running in the background. Any new timeKeeper process will check if the daemon is running and simply send the command via IPC to the daemon process.  
+The first running timeKeeper process will daemonize itself and keep running in the background. Any subsequently called timeKeeper process will check if the daemon is running and simply send the command via IPC to the daemon process.  
 Stopping the daemon process will also halt any time keeping. But current data is written to file upon exit, so nothing will be lost.  
 Log output from the daemon can be found in _/tmp/timeKeeper.log_.
 
