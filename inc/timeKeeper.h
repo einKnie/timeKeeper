@@ -15,6 +15,7 @@
 
 #define MIN_IDX 1
 #define MAX_IDX 5
+#define PROCNAME "timeKeeper"
 
 extern char g_pidfile[PATH_MAX];
 extern char g_savefile[PATH_MAX];

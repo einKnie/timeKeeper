@@ -12,6 +12,7 @@
 #include <fcntl.h>
 #include <errno.h>
 #include "taskCtl.h"
+#include "ui.h"
 
 taskData_t g_tasks;
 int        g_taskInit = 0;
@@ -54,7 +55,6 @@ int taskHasName(int idx) {
   }
 
   return (strlen(g_tasks.task[idx].name) > 0);
-
 }
 
 int setTaskName(int idx, const char *name) {
@@ -66,7 +66,6 @@ int setTaskName(int idx, const char *name) {
 
 int showTaskData() {
   char buf[MAX_TEXT*11];
-  char outbuf[MAX_TEXT*12];
   size_t offs = 0;
 
   for (int i = 0; i < MAX_IDX; i++) {
@@ -75,9 +74,7 @@ int showTaskData() {
     offs = strlen(buf);
   }
 
-  snprintf(outbuf, sizeof(outbuf), "notify-send -t 0 \"Tasks\" \"%s\"", buf);
-  system(outbuf);
-
+  notify(buf, 0);
   return 1;
 }
 
@@ -111,7 +108,6 @@ int storeTaskData(int idx, const char *file) {
   } else {
     for(int i = 0; i < MAX_IDX; i++) {
       task_t *t = &(g_tasks.task[i]);
-      // writeTask(fd, t);
       getTaskString(t, buf, sizeof(buf));
       write(fd, buf, strlen(buf));
     }

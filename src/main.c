@@ -14,12 +14,11 @@
 #include "procCtl.h"
 #include "ipcCtl.h"
 #include "taskCtl.h"
+#include "ui.h"
 
 void cleanup(void);
 void sigHdl(const int signum);
 void printHelp();
-
-static const char procname[] = "timeKeeper";
 
 // declared as extern in timeKeeper.h
 char g_pidfile[PATH_MAX] = "\0";
@@ -102,8 +101,8 @@ int main(int argc, char **argv) {
     exit(1);
   }
 
-  snprintf(g_pidfile, sizeof(g_pidfile), "/home/%s/.%s.pid", user, procname);
-  snprintf(g_savefile, sizeof(g_savefile), "/home/%s/.%s.dat", user, procname);
+  snprintf(g_pidfile, sizeof(g_pidfile), "/home/%s/.%s.pid", user, PROCNAME);
+  snprintf(g_savefile, sizeof(g_savefile), "/home/%s/.%s.dat", user, PROCNAME);
   printf("Checking pidfile at %s\n", g_pidfile);
 
   // check if a daemon is already running
@@ -129,13 +128,15 @@ int main(int argc, char **argv) {
   initIpc(g_pidfile, g_isDaemon);
 
   if (g_isDaemon) {
+    notify("Daemon running", 5);
     initTasks();
     struct msg message;
 
     while (1) {
       // daemon loop: wait for ipc here
-      waitForMsg(&message);
-      handleMsg(message);
+      if (waitForMsg(&message)) {
+        handleMsg(message);
+      }
     }
 
   } else {
@@ -159,6 +160,9 @@ void sigHdl(const int signum) {
 
 void cleanup(void) {
   if (g_isDaemon) {
+
+    notify("Shutting down", 5);
+
     // cleanup tasks
     switchToTask(0);
     storeTaskData(0, g_savefile);
@@ -193,6 +197,6 @@ void printHelp() {
   printf("\n");
   printf("Note: -s and -n require the task being set with -t also\n");
   printf("Note: <no> must be an integer in range %d to %d\n", MIN_IDX, MAX_IDX);
-  printf("Note: data is written to file '.%s.dat' in caller's home\n", procname);
+  printf("Note: data is written to file '.%s.dat' in caller's home\n", PROCNAME);
   printf("Last note: A logfile of the daemon process is kept at '/tmp/timeKeeper.log'\n");
 }

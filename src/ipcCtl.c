@@ -12,6 +12,7 @@
 #include <stdlib.h>
 #include "ipcCtl.h"
 #include "taskCtl.h"
+#include "ui.h"
 
 struct msgQueue {
   key_t key;
@@ -107,7 +108,7 @@ int handleMsg(struct msg message) {
     case EStartCtr:
       if (! taskHasName(message.idx)) {
         char in[MAX_TEXT] = "\0";
-        if (! getTaskName(in, MAX_TEXT)) {
+        if (! getInput("Task name:", in, sizeof(in))) {
           break;
         }
         setTaskName(message.idx, in);
@@ -136,19 +137,6 @@ int handleMsg(struct msg message) {
       return 0;
   }
 
-  return 1;
-}
-
-int getTaskName(char *buf, size_t n) {
-  FILE *out = popen("zenity --entry --text=\"Task name\"", "r");
-  fgets(buf, n, out);
-  if (strlen(buf) < 1) {
-    printf("aborted\n");
-    system("zenity --info --no-wrap --text=\"Aborted.\nNot starting task.\"");
-    return 0;
-  }
-  buf[strlen(buf) -1] = '\0';
-  printf("Got task name: %s\n", buf);
   return 1;
 }
 
