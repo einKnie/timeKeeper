@@ -24,7 +24,7 @@ int checkPidFile(const char *pidfile) {
   char buf[60] = "\0";
 
   if ((fd = open(pidfile, O_RDONLY)) < 0) {
-    printf("%d: %s\n", errno, strerror(errno));
+    if (errno != ENOENT) printf("%d: %s\n", errno, strerror(errno));
   } else {
     int rd = 0;
     if ((rd = read(fd, buf, sizeof(buf))) < 0) {
@@ -87,7 +87,6 @@ int daemonize() {
     printf("Error: failed to fork\n");
     exit(1);
   } else if (pid > 0) {
-    printf("parent terminating\n");
     exit(0);
   }
 
@@ -102,7 +101,6 @@ int daemonize() {
     printf("Error: failed to fork\n");
     exit(1);
   } else if (pid > 0) {
-    printf("middleman terminating\n");
     exit(0);
   }
 
