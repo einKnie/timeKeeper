@@ -19,10 +19,8 @@ void notify(const char *text, int t) {
 
   snprintf(outbuf, sizeof(outbuf), "notify-send -t %d \"%s\" \"%s\"", \
           (t * 1000), PROCNAME, text);
-  printf("trying to call:\n%s\n", outbuf);
+  printf("calling:\n%s\n", outbuf);
   if ((ret = system(outbuf)) < 0) {
-    // TODO: fix this: the call works, why is there an error then?
-    // (try using a variant of exec instead of system)
     printf("error: failed to send notification: %d\n", ret);
   }
 
