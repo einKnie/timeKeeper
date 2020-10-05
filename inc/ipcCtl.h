@@ -17,7 +17,6 @@ enum opType {
   EEndCtr,
   EShowInfo,
   ESetName,
-  EGetTime,
   ESave,
   EQuit
 };
@@ -28,7 +27,7 @@ enum opType {
 struct msg {
   int  type;
   int  idx;
-  char text[100];
+  char text[MAX_TEXT];
 };
 
 /// Initialize msgQueue

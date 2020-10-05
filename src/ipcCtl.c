@@ -34,7 +34,7 @@ int initIpc(int daemon) {
     // init ipc as listener
     msgid = msgget(key, 0666 | IPC_CREAT);
   } else {
-    // init opc as sender
+    // init ipc as sender
     msgid = msgget(key, 0666);
   }
 
@@ -127,6 +127,7 @@ int handleMsg(struct msg message) {
       showTaskData();
       break;
     case ESave:
+      printf("writing data to file %s\n", g_savefile);
       storeTaskData(message.idx, g_savefile);
       break;
     case EQuit:

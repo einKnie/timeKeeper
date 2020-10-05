@@ -48,9 +48,7 @@ int switchToTask(int idx) {
 
 int taskHasName(int idx) {
 
-  if (--idx < 0) {
-    return 0;
-  }
+  if (--idx < 0) return 0;
 
   return (strlen(g_tasks.task[idx].name) > 0);
 }
@@ -104,10 +102,13 @@ int storeTaskData(int idx, const char *file) {
   }
 
   if (idx > 0) {
-    idx -= 1;
+    idx--;
     task_t *t = &(g_tasks.task[idx]);
     getTaskString(t, buf, sizeof(buf));
-    write(fd, buf, strlen(buf));
+    if (write(fd, buf, strlen(buf)) < (int)strlen(buf)) {
+      printf("error: Failed to write to savefile\n");
+      ret = 0;
+    }
   } else {
     for(int i = 0; i < MAX_IDX; i++) {
       task_t *t = &(g_tasks.task[i]);

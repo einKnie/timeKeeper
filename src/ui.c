@@ -52,7 +52,7 @@ void popup(const char *text) {
   char buf[MAX_TEXT] = "\0";
   snprintf(buf, sizeof(buf), "zenity --info --no-wrap --text=\"%s\"", text);
   if ((ret = system(buf)) < 0) {
-    printf("error: failed to get user input\n");
+    printf("error: failed to show popup\n");
   }
 
 }
