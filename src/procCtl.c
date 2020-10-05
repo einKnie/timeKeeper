@@ -75,45 +75,49 @@ int cleanupPidFile(const char *pidfile) {
 }
 
 void daemonize() {
-  pid_t pid;
 
-  if ((pid = fork()) < 0) {
-    printf("Error: failed to fork\n");
-    exit(1);
-  } else if (pid > 0) {
-    exit(0);
+  pid_t pid = fork();
+  switch(pid) {
+    case -1:
+      printf("Failed to fork: %s\n", strerror(errno));
+      exit(1);
+    case 0: break;     // child
+    default: exit(0);  // parent
   }
 
-  if (setsid() < 0) {
-    exit(1);
-  }
-
-  signal(SIGCHLD, SIG_IGN);
-  signal(SIGHUP, SIG_IGN);
-
-  if ((pid = fork()) < 0) {
-    printf("Error: failed to fork\n");
-    exit(1);
-  } else if (pid > 0) {
-    exit(0);
-  }
-
-  umask(0);
-  chdir("/");
+  printf("Rerouting all output to logfile at %s\n", g_logfile);
   if (! rerouteLog()) {
     // close all file descriptors
+    printf("Failed to reroute stdin&&stdout\n logging disabled\n");
     int x;
     for (x = sysconf(_SC_OPEN_MAX); x >= 0; x--) {
       close(x);
     }
   }
 
+  if (setsid() < 0) {
+    printf("Failed to create new session: %s\n", strerror(errno));
+    exit(1);
+  }
+
+  umask(022);
+  if ((umask(022) & 022) != 022) {
+    printf("Failed to set umask\n");
+    exit(1);
+  }
+
+  if (chdir("/") != 0) {
+    printf("Failed to change directory: %s\n", strerror(errno));
+    exit(1);
+  }
+
+  printf("daemon initialized\n");
 }
 
 int rerouteLog() {
   if (g_logfd < 0) {
     if ((g_logfd = open(g_logfile, O_CREAT | O_APPEND | O_WRONLY, 0644)) < 0) {
-      return 1;
+      return 0;
     }
 
     dup2(g_logfd, STDOUT_FILENO);
