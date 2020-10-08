@@ -99,7 +99,7 @@ int main(int argc, char **argv) {
   struct msg message;
   message.type = type;
   message.idx  = idx;
-  sprintf(message.text, text);
+  strncpy(message.text, text, sizeof(message.text));
 
   // get pidfile path
   char *user = NULL;
