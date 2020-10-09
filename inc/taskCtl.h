@@ -50,8 +50,11 @@ int setTaskName(int idx, const char *name);
 /// @return 1 on success, 0 on failure
 int storeTaskData(int idx, const char *file);
 
+/// Write task data to string \a buf
+int getTaskData(int idx, char *buf, size_t n);
+
 /// Show a notification containing the current task data
-int showTaskData();
+int showTaskData(int idx);
 
 /// Write task data to \a buf
 /// @param [in] t task

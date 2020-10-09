@@ -15,6 +15,7 @@
 
 #define MIN_IDX 1                 ///< min task index
 #define MAX_IDX 5                 ///< max task index [ increase this to add more tasks ]
+#define TASKS (MAX_IDX - (MIN_IDX - 1))
 #define PROCNAME "timeKeeper"     ///< name used for all files (pid, save, log)
 
 extern char g_pidfile[PATH_MAX];  ///< pidfile path

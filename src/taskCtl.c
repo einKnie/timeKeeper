@@ -60,21 +60,35 @@ int setTaskName(int idx, const char *name) {
   return 1;
 }
 
-int showTaskData() {
-  char buf[MAX_TEXT*11];
-  size_t offs = 0;
+int showTaskData(int idx) {
+  char buf[MAX_TEXT * (TASKS * 2)] = "\0";
 
-  for (int i = 0; i < MAX_IDX; i++) {
-    task_t *t = &(g_tasks.task[i]);
-    getTaskString(t, buf + offs, MAX_TEXT * 2);
-    offs = strlen(buf);
-  }
-
-  getCumTaskTime(buf + offs, MAX_TEXT);
+  getTaskData(idx, buf, sizeof(buf));
+  getCumTaskTime(buf + strlen(buf), MAX_TEXT);
 
   notify(buf, 0);
   return 1;
 }
+
+int getTaskData(int idx, char *buf, size_t n) {
+  size_t offs = 0;
+  int i = 0;
+  int j = MAX_IDX;
+
+  if (idx > 0) {
+    i = --idx;
+    j = i + 1;
+  }
+
+  for (; i < j; i++) {
+    task_t *t = &(g_tasks.task[i]);
+    getTaskString(t, buf + offs, (n > offs) ? n - offs: 0);
+    offs = strlen(buf);
+  }
+
+  return 1;
+}
+
 
 int storeTaskData(int idx, const char *file) {
   int ret = 1;
@@ -90,7 +104,7 @@ int storeTaskData(int idx, const char *file) {
   }
 
   time_t now;
-  char buf[MAX_TEXT*2];
+  char buf[MAX_TEXT * (TASKS * 2)];
   struct tm *tm_info;
 
   now = time(NULL);
@@ -100,24 +114,11 @@ int storeTaskData(int idx, const char *file) {
     printf("error: Failed to write to savefile\n");
     ret = 0;
   }
-
-  if (idx > 0) {
-    idx--;
-    task_t *t = &(g_tasks.task[idx]);
-    getTaskString(t, buf, sizeof(buf));
-    if (write(fd, buf, strlen(buf)) < (int)strlen(buf)) {
-      printf("error: Failed to write to savefile\n");
-      ret = 0;
-    }
-  } else {
-    for(int i = 0; i < MAX_IDX; i++) {
-      task_t *t = &(g_tasks.task[i]);
-      getTaskString(t, buf, sizeof(buf));
-      if (write(fd, buf, strlen(buf)) < (int)strlen(buf)) {
-        printf("error: Failed to write to savefile\n");
-        ret = 0;
-      }
-    }
+  
+  getTaskData(idx, buf, sizeof(buf));
+  if (write(fd, buf, strlen(buf)) < (int)strlen(buf)) {
+    printf("error: Failed to write to savefile\n");
+    ret = 0;
   }
 
   getCumTaskTime(buf, sizeof(buf));

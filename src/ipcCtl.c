@@ -124,7 +124,7 @@ int handleMsg(struct msg message) {
       break;
     case EShowInfo:
       printf("show info notification\n");
-      showTaskData();
+      showTaskData(message.idx);
       break;
     case ESave:
       printf("writing data to file %s\n", g_savefile);
