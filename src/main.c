@@ -19,6 +19,7 @@
 void cleanup(void);
 void sigHdl(const int signum);
 void printHelp();
+int  validateIdx(int idx, int optional);
 
 // declared as extern in timeKeeper.h
 char g_pidfile[PATH_MAX]  = "\0";
@@ -64,7 +65,6 @@ int main(int argc, char **argv) {
         break;
       case 'x':
         type = ESave;
-        idx = 0;
         break;
       case 'q':
         type = EQuit;
@@ -78,19 +78,42 @@ int main(int argc, char **argv) {
   }
 
   int err = 0;
-  if ((idx != 0) && (type == ENone)) {
-    // no action
-    printf("error: no action specified for task %d\n", idx);
-    err++;
-  }
-  if (((type == EStartCtr) || (type == ESetName)) && (idx == 0)) {
-    // action w/o task
-    printf("error: no task specified for action\n");
-    err++;
+  switch (type) {
+    case EStartCtr:
+    case ESetName:
+      if (!validateIdx(idx, 1)) {
+        err++;
+        printf("error: task must be supplied in range %d-%d\n", MIN_IDX, MAX_IDX);
+      }
+      break;
+    case ESave:
+    case EShowInfo:
+      if (!validateIdx(idx, 0)) {
+        err++;
+      }
+      break;
+    case EQuit:
+    case EEndCtr:
+      if (!validateIdx(idx, -1)) {
+        err++;
+        printf("Invalid option -t in combination with other option\n");
+      }
+      break;
+    case ENone:
+      if (!validateIdx(idx, -1)) {
+        err++;
+        printf("error: no action specified for task %d\n", idx);
+      }
+      break;
+    default:
+      printf("Unrecognized action given\n");
+      type = ENone;
+      err++;
+      break;
   }
 
   if (err) {
-    printf("invalid configuration received\n");
+    printf("invalid configuration received\n\n");
     printHelp();
     exit(1);
   }
@@ -101,7 +124,7 @@ int main(int argc, char **argv) {
   message.idx  = idx;
   strncpy(message.text, text, sizeof(message.text));
 
-  // get pidfile path
+  // get filepaths
   char *user = NULL;
   if ((user = getlogin()) == NULL) {
     printf("error: cannot determine current user\n");
@@ -188,9 +211,11 @@ void cleanup(void) {
 // ----- help -----
 
 void printHelp() {
-  printf("timeKeeper v.%d\n", VERSION);
-  printf("\ttimeKeeper [-t <no> -n -s -e -v -x -q -h]\n");
-  printf("-t <no> \t... select a task <no>\n");
+  printf("%s v.%d.%d\n", PROCNAME, VERSION, MINVERSION);
+  printf("keep track of how much time you spend on various tasks\n");
+  printf("usage:\n");
+  printf("\ttimeKeeper [options]\n");
+  printf("-t <no> \t... select a task <no> [%d - %d]\n", MIN_IDX, MAX_IDX);
   printf("-n <str>\t... set name <str> for selected task\n");
   printf("-s      \t... start counter for selected task\n");
   printf("-e      \t... stop any running task counter\n");
@@ -199,8 +224,42 @@ void printHelp() {
   printf("-q      \t... stop daemon (writes data to file automatically)\n");
   printf("-h      \t... print this help message and exit\n");
   printf("\n");
-  printf("Note: -s and -n require the task being set with -t also\n");
-  printf("Note: <no> must be an integer in range %d to %d\n", MIN_IDX, MAX_IDX);
-  printf("Note: data is written to file '.%s.dat' in caller's home\n", PROCNAME);
-  printf("Last note: A logfile of the daemon process is kept at '/tmp/%s.log'\n", PROCNAME);
+  printf("notes:\n");
+  printf(" -s and -n require the task being set with -t also\n");
+  printf(" -v and -x may be combined with -t to show/print only this task's data\n");
+  printf(" all options except -t are mutually exclusive\n");
+  printf(" data is written to file '.%s.dat' in caller's home\n", PROCNAME);
+  printf(" a logfile of the daemon process is kept at '/tmp/%s.log'\n", PROCNAME);
+}
+
+/*  Check if provided index is valid
+ *  param optional:
+ *    -1 ... idx must not be set (i.e. == 0)
+ *     0 ... idx may be 0
+ *     1 ... idx must be set (i.e. != 0)
+*/
+int validateIdx(int idx, int optional) {
+  int err = 0;
+
+  if ((idx != 0) && ((idx < MIN_IDX) || (idx > MAX_IDX))) {
+    // set && out of range
+    printf("error: task must be supplied in range %d-%d\n", MIN_IDX, MAX_IDX);
+    err++;
+  }
+
+  if (idx == 0) {
+    // not set
+    if (optional <= 0) {
+      // not set && not required
+      return 1;
+    }
+  } else {
+    // set
+    if ((optional >= 0) && !err) {
+      // allowed && correct
+      return 1;
+    }
+  }
+
+  return 0;
 }

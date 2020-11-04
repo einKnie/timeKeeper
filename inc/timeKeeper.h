@@ -11,6 +11,8 @@
 #include <linux/limits.h>
 
 #define VERSION 1
+#define MINVERSION 0
+
 #define MAX_TEXT 100
 
 #define MIN_IDX 1                 ///< min task index
