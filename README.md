@@ -34,7 +34,7 @@ The cumulative task times are saved automatically upon exit.
     timeKeeper -t1 -n "meetings" # set name of task1 to 'meetings'
     timeKeeper -t1 -s            # start task1
     ...
-    timeKeeper -t4 -s            # stop running task and start task3
+    timeKeeper -t4 -s            # stop running task and start task4
     ...
     timeKeeper -x                # write data of all tasks to file
 
