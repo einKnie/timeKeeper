@@ -27,7 +27,7 @@ The cumulative task times are saved automatically upon exit.
 
 \* number can be increased in _timeKeeper.h_  
 \*\* if a task without a set name is started, the user is automatically queried for a name.  
-\*\*\* data is stored in $HOME/.timeKeeper.dat
+\*\*\* data is stored in $HOME/timeKeeper.dat
 
 ### Examples
 
