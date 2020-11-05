@@ -132,7 +132,7 @@ int main(int argc, char **argv) {
   }
 
   snprintf(g_pidfile,  sizeof(g_pidfile),  "/home/%s/.%s.pid", user, PROCNAME);
-  snprintf(g_savefile, sizeof(g_savefile), "/home/%s/.%s.dat", user, PROCNAME);
+  snprintf(g_savefile, sizeof(g_savefile), "/home/%s/%s.dat", user, PROCNAME);
   snprintf(g_logfile,  sizeof(g_logfile),  "/tmp/%s.log", PROCNAME);
   printf("Checking pidfile at %s\n", g_pidfile);
 
@@ -228,7 +228,7 @@ void printHelp() {
   printf(" -s and -n require the task being set with -t also\n");
   printf(" -v and -x may be combined with -t to show/print only this task's data\n");
   printf(" all options except -t are mutually exclusive\n");
-  printf(" data is written to file '.%s.dat' in caller's home\n", PROCNAME);
+  printf(" data is written to file '%s.dat' in caller's home\n", PROCNAME);
   printf(" a logfile of the daemon process is kept at '/tmp/%s.log'\n", PROCNAME);
 }
 
