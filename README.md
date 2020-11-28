@@ -1,8 +1,6 @@
 # timeKeeper
 
-~~_This is a work in progress. The codebase as well as this README will be cleaned up once I'm done._~~
-
-Version 1.0
+Version 1.1
 
 ## Functionality
 

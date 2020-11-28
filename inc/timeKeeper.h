@@ -11,7 +11,7 @@
 #include <linux/limits.h>
 
 #define VERSION 1
-#define MINVERSION 0
+#define MINVERSION 1
 
 #define MAX_TEXT 100
 
