@@ -11,6 +11,9 @@
 #include <errno.h>
 #include <linux/limits.h>
 
+#define DEFAULT_LOGLEVEL ELogWarn
+#define DEFAULT_LOGSTYLE ELogStyleNone
+
 #define MAX_FILE_PATH_LEN   PATH_MAX  ///< max logfile path length
 #define MAX_LINE_LEN        700 ///< max logging line length. Set to absurdly hight length
 
