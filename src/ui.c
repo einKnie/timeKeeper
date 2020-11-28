@@ -19,9 +19,9 @@ void notify(const char *text, int t) {
 
   snprintf(outbuf, sizeof(outbuf), "notify-send -t %d \"%s\" \"%s\"", \
           (t * 1000), PROCNAME, text);
-  printf("calling:\n%s\n", outbuf);
+  log_debug("calling:\n%s\n", outbuf);
   if ((ret = system(outbuf)) < 0) {
-    printf("error: failed to send notification: %d\n", ret);
+    log_error("failed to send notification: %d\n", ret);
   }
 
 }
@@ -34,12 +34,12 @@ int getInput(const char *prompt, char *out, size_t n) {
   FILE *fd = popen(buf, "r");
   fgets(out, n, fd);
   if (strlen(out) < 1) {
-    printf("user input aborted\n");
+    log_debug("user input aborted\n");
     popup("Aborted");
     return 0;
   }
   out[strlen(out) -1] = '\0';
-  printf("Got user input: %s\n", out);
+  log_debug("Got user input: %s\n", out);
   return 1;
 
 }
@@ -50,7 +50,7 @@ void popup(const char *text) {
   char buf[MAX_TEXT] = "\0";
   snprintf(buf, sizeof(buf), "zenity --info --no-wrap --text=\"%s\"", text);
   if ((ret = system(buf)) < 0) {
-    printf("error: failed to show popup\n");
+    log_error("failed to show popup\n");
   }
 
 }

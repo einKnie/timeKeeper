@@ -39,13 +39,16 @@ int main(int argc, char **argv) {
   sigaction(SIGTERM, &act, 0);
   atexit(cleanup);
 
+  logLevel_e log_level = DEFAULT_LOGLEVEL;
+  log_init(log_level, DEFAULT_LOGSTYLE, NULL);
+
   // parse params
   int  type = ENone;
   int  idx  = 0;
   char text[MAX_TEXT] = "\0";
 
   int opt;
-  while ((opt = getopt(argc, argv, "t:n:sevxqh")) != -1) {
+  while ((opt = getopt(argc, argv, "t:n:sevxqhl:")) != -1) {
     switch(opt) {
       case 't':
         idx = atoi(optarg);
@@ -69,11 +72,14 @@ int main(int argc, char **argv) {
       case 'q':
         type = EQuit;
         break;
+      case 'l':
+        log_level = (logLevel_e)atoi(optarg);
+        break;
       case 'h':
         printHelp();
         exit(0);
         break;
-      default: printf("Error: invalid parameter: %c\n", opt); exit(1);
+      default: log_error("invalid parameter: %c\n", opt); exit(1);
     }
   }
 
@@ -83,7 +89,7 @@ int main(int argc, char **argv) {
     case ESetName:
       if (!validateIdx(idx, 1)) {
         err++;
-        printf("error: task must be supplied in range %d-%d\n", MIN_IDX, MAX_IDX);
+        log_error("task must be supplied in range %d-%d\n", MIN_IDX, MAX_IDX);
       }
       break;
     case ESave:
@@ -96,27 +102,30 @@ int main(int argc, char **argv) {
     case EEndCtr:
       if (!validateIdx(idx, -1)) {
         err++;
-        printf("Invalid option -t in combination with other option\n");
+        log_error("Invalid option -t in combination with other option\n");
       }
       break;
     case ENone:
       if (!validateIdx(idx, -1)) {
         err++;
-        printf("error: no action specified for task %d\n", idx);
+        log_error("no action specified for task %d\n", idx);
       }
       break;
     default:
-      printf("Unrecognized action given\n");
+      log_error("Unrecognized action given\n");
       type = ENone;
       err++;
       break;
   }
 
   if (err) {
-    printf("invalid configuration received\n\n");
+    log_error("invalid configuration received\n\n");
     printHelp();
     exit(1);
   }
+
+  // set updated loglevel
+  log_init(log_level, DEFAULT_LOGSTYLE, NULL);
 
   // prepare message
   struct msg message;
@@ -127,38 +136,38 @@ int main(int argc, char **argv) {
   // get filepaths
   char *user = NULL;
   if ((user = getlogin()) == NULL) {
-    printf("error: cannot determine current user\n");
+    log_error("cannot determine current user\n");
     exit(1);
   }
 
   snprintf(g_pidfile,  sizeof(g_pidfile),  "/home/%s/.%s.pid", user, PROCNAME);
   snprintf(g_savefile, sizeof(g_savefile), "/home/%s/%s.dat", user, PROCNAME);
   snprintf(g_logfile,  sizeof(g_logfile),  "/tmp/%s.log", PROCNAME);
-  printf("Checking pidfile at %s\n", g_pidfile);
+  log_notice("Checking pidfile at %s\n", g_pidfile);
 
   // check if a daemon is already running
   int pid = -1;
 
   do {
     if ((pid = checkPidFile(g_pidfile)) < 0) {
-      printf("Error: Failed to read pidfile\n");
+      log_error("failed to read pidfile\n");
       exit(1);
     }
 
     if (pid == 0) {
-      printf("no daemon found, becoming the new daemon!\n");
+      log_notice("no daemon found, becoming the new daemon!\n");
       daemonize();
       g_isDaemon = 1;
       if (! createPidFile(g_pidfile)) {
-        printf("error: failed to create pid file\n");
+        log_error("failed to create pid file\n");
         exit(1);
       }
     } else {
-      printf("got pid of daemon: %d\n", pid);
+      log_notice("got pid of daemon: %d\n", pid);
       if (! checkProcess(pid)) {
-        printf("daemon not found: cleaning up\n");
+        log_notice("daemon not found: cleaning up\n");
         if (! cleanupPidFile(g_pidfile)) {
-          printf("error: failed to remove pidfile\n");
+          log_error("failed to remove pidfile\n");
           exit(1);
         }
         continue;
@@ -168,7 +177,7 @@ int main(int argc, char **argv) {
   } while (1);
 
   if (! initIpc(g_isDaemon)) {
-    printf("error: Failed to initialize message queue\n");
+    log_error("failed to initialize message queue\n");
     exit(1);
   }
 
@@ -209,15 +218,15 @@ void cleanup(void) {
     storeTaskData(0, g_savefile);
 
     if (! exitIpc()) {
-      printf("error: Failed to remove message queue\n");
+      log_error("failed to remove message queue\n");
     }
     if (! cleanupPidFile(g_pidfile)) {
-      printf("error: Failed to remove pid file at: %s\n", g_pidfile);
+      log_error("failed to remove pid file at: %s\n", g_pidfile);
     }
   }
 
   if (g_logfd > -1) {
-    printf("process %d exiting\n", getpid());
+    log_always("process %d exiting\n", getpid());
     close(g_logfd);
   }
 }
@@ -257,7 +266,7 @@ int validateIdx(int idx, int optional) {
 
   if ((idx != 0) && ((idx < MIN_IDX) || (idx > MAX_IDX))) {
     // set && out of range
-    printf("error: task must be supplied in range %d-%d\n", MIN_IDX, MAX_IDX);
+    log_error("task must be supplied in range %d-%d\n", MIN_IDX, MAX_IDX);
     err++;
   }
 

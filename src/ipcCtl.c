@@ -23,7 +23,7 @@ int g_initQueue = 0;
 int initIpc(int daemon) {
 
   if (g_initQueue) {
-    printf("queue already initialized. doing nothing\n");
+    log_debug("queue already initialized. doing nothing\n");
     return 1;
   }
 
@@ -39,9 +39,9 @@ int initIpc(int daemon) {
   }
 
   if (msgid < 0) {
-    printf("Failed to open msgqueue: %s\n", strerror(errno));
+    log_error("Failed to open msgqueue: %s\n", strerror(errno));
   } else {
-    printf("Message queue created\n");
+    log_notice("Message queue created\n");
     g_msgQueue.key = key;
     g_msgQueue.id  = msgid;
     g_initQueue = 1;
@@ -52,33 +52,33 @@ int initIpc(int daemon) {
 
 int exitIpc() {
   if (! g_initQueue) {
-    printf("queue not initialized. doing nothing...\n");
+    log_debug("queue not initialized. doing nothing...\n");
     return 1;
   }
 
   // remove queue
   if (msgctl(g_msgQueue.id, IPC_RMID, NULL) < 0) {
-    printf("failed to remove msgqueue: %s\n", strerror(errno));
+    log_error("failed to remove msgqueue: %s\n", strerror(errno));
     return 0;
   }
 
-  printf("removed message queue\n");
+  log_notice("removed message queue\n");
   return 1;
 }
 
 int waitForMsg(struct msg *message) {
 
   if (! g_initQueue) {
-    printf("queue not initialized. doing nothing...\n");
+    log_debug("queue not initialized. doing nothing...\n");
     return 0;
   }
 
   if ((msgrcv(g_msgQueue.id, message, sizeof(*message), 0, 0)) < 0) {
-    printf("failed to receive message: %s\n", strerror(errno));
+    log_error("failed to receive message: %s\n", strerror(errno));
     return 0;
   } else {
-    printf("received message\n");
-    printf("type: %d\nidx: %d\ntext: %s\n", \
+    log_notice("received message\n");
+    log_debug("type: %d\nidx: %d\ntext: %s\n", \
             message->type, message->idx, message->text);
     return 1;
   }
@@ -87,22 +87,22 @@ int waitForMsg(struct msg *message) {
 int sendMsg(struct msg message) {
 
   if (! g_initQueue) {
-    printf("queue not initialized. doing nothing...\n");
+    log_debug("queue not initialized. doing nothing...\n");
     return 0;
   }
 
   if ((msgsnd(g_msgQueue.id, &message, sizeof(message), 0)) < 0) {
-    printf("failed to send message: %s\n", strerror(errno));
+    log_error("failed to send message: %s\n", strerror(errno));
     return 0;
   } else {
-    printf("sent message\n");
+    log_debug("sent message\n");
     return 1;
   }
 }
 
 int handleMsg(struct msg message) {
 
-  printf("handling message\n");
+  log_debug("handling message\n");
 
   switch(message.type) {
     case EStartCtr:
@@ -119,22 +119,22 @@ int handleMsg(struct msg message) {
       switchToTask(0);
       break;
     case ESetName:
-      printf("set task name (%s) for task %d\n", message.text, message.idx);
+      log_debug("set task name (%s) for task %d\n", message.text, message.idx);
       setTaskName(message.idx, message.text);
       break;
     case EShowInfo:
-      printf("show info notification\n");
+      log_debug("show info notification\n");
       showTaskData(message.idx);
       break;
     case ESave:
-      printf("writing data to file %s\n", g_savefile);
+      log_debug("writing data to file %s\n", g_savefile);
       storeTaskData(message.idx, g_savefile);
       break;
     case EQuit:
-      printf("Shutting down...\n");
+      log_debug("Shutting down...\n");
       exit(0);
     default:
-      printf("invalid message received\n");
+      log_debug("invalid message received\n");
       return 0;
   }
 

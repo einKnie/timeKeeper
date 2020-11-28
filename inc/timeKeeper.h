@@ -9,9 +9,13 @@
 #define _TIME_KEEPER_H_
 
 #include <linux/limits.h>
+#include "log.h"
 
 #define VERSION 1
 #define MINVERSION 1
+
+#define DEFAULT_LOGLEVEL ELogVerbose
+#define DEFAULT_LOGSTYLE ELogStyleMinimal
 
 #define MAX_TEXT 100
 

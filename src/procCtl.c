@@ -22,15 +22,15 @@ int checkPidFile(const char *pidfile) {
   char buf[60] = "\0";
 
   if ((fd = open(pidfile, O_RDONLY)) < 0) {
-    if (errno != ENOENT) printf("%d: %s\n", errno, strerror(errno));
+    if (errno != ENOENT) log_error("%d: %s\n", errno, strerror(errno));
   } else {
     int rd = 0;
     if ((rd = read(fd, buf, sizeof(buf))) < 0) {
-      printf("Failed to read pidfile: %s\n", strerror(errno));
+      log_debug("Failed to read pidfile: %s\n", strerror(errno));
       ret = -1;
     } else {
       buf[rd] = '\0';
-      printf("read pid: %s\n", buf);
+      log_debug("read pid: %s\n", buf);
       if ((ret = atoi(buf)) == 0) {
         ret = -1;
       }
@@ -56,16 +56,16 @@ int createPidFile(const char *pidfile) {
   int  pid     = getpid();
 
   if ((fd = open(pidfile, O_CREAT | O_RDWR, 0644)) < 0) {
-    printf("%s\n", strerror(errno));
+    log_error("%s\n", strerror(errno));
     return ret;
   }
 
   sprintf(buf, "%d", pid);
   if (write(fd, buf, sizeof(buf)) < 0) {
-    printf("%s\n", strerror(errno));
+    log_error("%s\n", strerror(errno));
     ret = 0;
   } else {
-    printf("Created pid file\n");
+    log_notice("Created pid file\n");
     ret = 1;
   }
 
@@ -75,10 +75,10 @@ int createPidFile(const char *pidfile) {
 
 int cleanupPidFile(const char *pidfile) {
   if (remove(pidfile) < 0) {
-    printf("error: failed to remove pid file\n");
+    log_error("failed to remove pid file\n");
     return 0;
   } else {
-    printf("removed pid file\n");
+    log_notice("removed pid file\n");
     return 1;
   }
 }
@@ -88,16 +88,16 @@ void daemonize() {
   pid_t pid = fork();
   switch(pid) {
     case -1:
-      printf("Failed to fork: %s\n", strerror(errno));
+      log_error("Failed to fork: %s\n", strerror(errno));
       exit(1);
     case 0: break;     // child
     default: exit(0);  // parent
   }
 
-  printf("Rerouting all output to logfile at %s\n", g_logfile);
+  log_always("Rerouting all output to logfile at %s\n", g_logfile);
   if (! rerouteLog()) {
     // close all file descriptors
-    printf("Failed to reroute stdin&&stdout\n logging disabled\n");
+    log_warning("Failed to reroute stdin&&stdout\n logging disabled\n");
     int x;
     for (x = sysconf(_SC_OPEN_MAX); x >= 0; x--) {
       close(x);
@@ -105,22 +105,23 @@ void daemonize() {
   }
 
   if (setsid() < 0) {
-    printf("Failed to create new session: %s\n", strerror(errno));
+    log_error("Failed to create new session: %s\n", strerror(errno));
     exit(1);
   }
 
   umask(022);
   if ((umask(022) & 022) != 022) {
-    printf("Failed to set umask\n");
+    log_error("Failed to set umask\n");
     exit(1);
   }
 
   if (chdir("/") != 0) {
-    printf("Failed to change directory: %s\n", strerror(errno));
+    log_error("Failed to change directory: %s\n", strerror(errno));
     exit(1);
   }
 
-  printf("daemon initialized\n");
+  log_reinit(-1, ELogStyleVerbose);
+  log_always("daemon initialized\n");
 }
 
 int rerouteLog() {

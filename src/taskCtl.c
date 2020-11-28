@@ -99,7 +99,7 @@ int storeTaskData(int idx, const char *file) {
 
   int fd = -1;
   if ((fd = open(file, O_CREAT | O_APPEND | O_RDWR, 0666)) < 0) {
-    printf("could not open savefile: %s\n", strerror(errno));
+    log_error("could not open savefile: %s\n", strerror(errno));
     return 0;
   }
 
@@ -111,25 +111,25 @@ int storeTaskData(int idx, const char *file) {
   tm_info = localtime(&now);
   strftime(buf, sizeof(buf), "%Y-%m-%d %H:%M:%S", tm_info);
   if (write(fd, buf, strlen(buf)) < (int)strlen(buf)) {
-    printf("error: Failed to write to savefile\n");
+    log_error("failed to write to savefile\n");
     ret = 0;
   }
-  
+
   getTaskData(idx, buf, sizeof(buf));
   if (write(fd, buf, strlen(buf)) < (int)strlen(buf)) {
-    printf("error: Failed to write to savefile\n");
+    log_error("failed to write to savefile\n");
     ret = 0;
   }
 
   getCumTaskTime(buf, sizeof(buf));
   if (write(fd, buf, strlen(buf)) < (int)strlen(buf)) {
-    printf("error: Failed to write to savefile\n");
+    log_error("failed to write to savefile\n");
     ret = 0;
   }
 
   snprintf(buf, sizeof(buf), "\n-------------------\n");
   if (write(fd, buf, strlen(buf)) < (int)strlen(buf)) {
-    printf("error: Failed to write to savefile\n");
+    log_error("failed to write to savefile\n");
     ret = 0;
   }
   close(fd);
@@ -185,10 +185,10 @@ int getCumTaskTime(char *buf, size_t n) {
 
 int stopTask(int idx) {
 
-  printf("stopping task %d\n", idx);
+  log_notice("stopping task %d\n", idx);
 
   if (idx != g_tasks.active) {
-    printf("not stopping an already stopped task\n");
+    log_debug("not stopping an already stopped task\n");
     return 1;
   }
 
@@ -206,10 +206,10 @@ int stopTask(int idx) {
 
 int startTask(int idx) {
 
-  printf("starting task %d\n", idx);
+  log_notice("starting task %d\n", idx);
 
   if (idx == g_tasks.active) {
-    printf("not starting active task again\n");
+    log_debug("not starting active task again\n");
     return 1;
   }
 
