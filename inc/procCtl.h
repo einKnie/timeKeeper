@@ -13,6 +13,11 @@
 /// @return 0 if no file exists, -1 on error, pid of daemon on success
 int checkPidFile(const char *pidfile);
 
+/// Check if a process is running by pid
+/// @param [in] pid
+/// @return 0 if process is not running, 1 if it is
+int checkProcess(int pid);
+
 /// Create a pidfile
 /// @param [in] pidfile path
 /// @return 0 on failure, 1 on success

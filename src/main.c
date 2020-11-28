@@ -138,25 +138,39 @@ int main(int argc, char **argv) {
 
   // check if a daemon is already running
   int pid = -1;
-  if ((pid = checkPidFile(g_pidfile)) < 0) {
-    printf("Error: Failed to read pidfile\n");
-    exit(1);
-  }
 
-  if (pid != 0) {
-    printf("got pid of daemon: %d\n", pid);
-  } else {
-    printf("no daemon found, becoming the new daemon!\n");
-    daemonize();
-    // we are a daemon now
-    g_isDaemon = 1;
-    if (! createPidFile(g_pidfile)) {
-      printf("error: failed to create pid file\n");
+  do {
+    if ((pid = checkPidFile(g_pidfile)) < 0) {
+      printf("Error: Failed to read pidfile\n");
       exit(1);
     }
-  }
 
-  initIpc(g_isDaemon);
+    if (pid == 0) {
+      printf("no daemon found, becoming the new daemon!\n");
+      daemonize();
+      g_isDaemon = 1;
+      if (! createPidFile(g_pidfile)) {
+        printf("error: failed to create pid file\n");
+        exit(1);
+      }
+    } else {
+      printf("got pid of daemon: %d\n", pid);
+      if (! checkProcess(pid)) {
+        printf("daemon not found: cleaning up\n");
+        if (! cleanupPidFile(g_pidfile)) {
+          printf("error: failed to remove pidfile\n");
+          exit(1);
+        }
+        continue;
+      }
+    }
+    break;
+  } while (1);
+
+  if (! initIpc(g_isDaemon)) {
+    printf("error: Failed to initialize message queue\n");
+    exit(1);
+  }
 
   if (g_isDaemon) {
     notify("Daemon running", 5);

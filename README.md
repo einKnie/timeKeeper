@@ -5,12 +5,14 @@
 Version 1.0
 
 ## Functionality
-**[LINUX ONLY]**  
 
 Keep track of how much time you spend on a number of tasks.  
 The program keeps track of the cumulative time any given task was active. Thus, task switches are easily possible. Only one task can be active at a time.  
 The cumulative task times are saved automatically upon exit.
 
+### Prerequisites
+
+Needs some sort of notification daemon running and zenity installed.
 
 ### Usage
 
@@ -34,7 +36,7 @@ The cumulative task times are saved automatically upon exit.
     timeKeeper -t1 -n "meetings" # set name of task1 to 'meetings'
     timeKeeper -t1 -s            # start task1
     ...
-    timeKeeper -t4 -s            # stop running task and start task4
+    timeKeeper -t4 -s            # stop running task and start task4 (user will be queried for name)
     ...
     timeKeeper -x                # write data of all tasks to file
 
@@ -61,10 +63,13 @@ The first running timeKeeper process will daemonize itself and keep running in t
 Stopping the daemon process will also halt any time keeping. But current data is written to file upon exit, so nothing will be lost.  
 Log output from the daemon can be found in _/tmp/timeKeeper.log_.
 
-### TODO
+#### Issues
 
-This is a list of features that will be implemented in the future:  
-*  more than one action possible per call  
+Known issues:
+
+#### Todo
+
+This is a list of features that might be implemented in the future:  
 *  possibility to resume last active task after record keeping has been disabled with _-e_
 
 ### Example Configuration and Usage

@@ -40,6 +40,15 @@ int checkPidFile(const char *pidfile) {
   return ret;
 }
 
+int checkProcess(int pid) {
+  int ret = 0;
+  char outbuf[MAX_TEXT];
+
+  snprintf(outbuf, sizeof(outbuf), "ps -p %d &>/dev/null", pid);
+  ret = system(outbuf);
+  return (ret == 0 ? 1 : 0);
+}
+
 int createPidFile(const char *pidfile) {
   int  ret     = 0;
   int  fd      = -1;
