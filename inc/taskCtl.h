@@ -29,7 +29,7 @@ typedef struct taskData {
 void initTasks();
 
 /// Switch to task \a idx
-/// @param idx index of next task. if 0, stop all tasks
+/// @param [in] idx index of next task. if 0, stop all tasks
 /// @return 1 on success, 0 on failure
 /// @note: any previously active task is stopped
 int switchToTask(int idx);

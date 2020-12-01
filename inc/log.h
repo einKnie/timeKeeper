@@ -1,6 +1,10 @@
-/// @file log.h
-/// @brief header file of logger
-
+/*  _   _                _  __
+ * | |_(_)_ __ ___   ___| |/ /___  ___ _ __   ___ _ __
+ * | __| | '_ ` _ \ / _ \ ' // _ \/ _ \ '_ \ / _ \ '__|
+ * | |_| | | | | | |  __/ . \  __/  __/ |_) |  __/ |
+ *  \__|_|_| |_| |_|\___|_|\_\___|\___| .__/ \___|_|
+ *   <einKnie@gmx.at>                 |_|
+ */
 #ifndef _LOG_H_
 #define _LOG_H_
 
@@ -43,6 +47,6 @@ void log_debug(const char *fmt, ...);
 void log_always(const char *fmt, ...);
 
 char* get_logstring(char *buf, logStyle_e log_style, const char *log_level, const char *fmt);
-char* to_upper(const char *in, char *buf, int len);
+char* to_upper(const char *in, char *buf);
 
 #endif // !_LOG_H_

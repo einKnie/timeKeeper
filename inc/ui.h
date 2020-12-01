@@ -10,7 +10,6 @@
 
 #include "timeKeeper.h"
 
-
 /// Send a notification
 /// @param [in] text
 /// @param [in] t notification timeout in seconds [ 0 == no timeout ]

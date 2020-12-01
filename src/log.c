@@ -1,9 +1,13 @@
-/// @file log.c
-/// @brief logging functions
-
+/*  _   _                _  __
+ * | |_(_)_ __ ___   ___| |/ /___  ___ _ __   ___ _ __
+ * | __| | '_ ` _ \ / _ \ ' // _ \/ _ \ '_ \ / _ \ '__|
+ * | |_| | | | | | |  __/ . \  __/  __/ |_) |  __/ |
+ *  \__|_|_| |_| |_|\___|_|\_\___|\___| .__/ \___|_|
+ *   <einKnie@gmx.at>                 |_|
+ */
 #include "log.h"
-#include <time.h>
 #include "string.h"
+#include <time.h>
 
 // file global logger configuration. Change log target via log_init() & log_exit()
 logLevel_e log_level = ELogError;
@@ -106,7 +110,7 @@ void log_error(const char *fmt, ...) {
   get_logstring(buf, log_style, "error", fmt);
 
   va_start(args, fmt);
-  vfprintf(log_stdout, buf, args);  // intentionally do not check return value, since there's nothing we can do about it
+  vfprintf(log_stdout, buf, args);
   va_end(args);
   fflush(log_stdout);
 }
@@ -134,7 +138,7 @@ void log_warning(const char *fmt, ...) {
   get_logstring(buf, log_style, "warning", fmt);
 
   va_start(args, fmt);
-  vfprintf(log_stdout, buf, args);  // intentionally do not check return value, since there's nothing we can do about it
+  vfprintf(log_stdout, buf, args);
   va_end(args);
   fflush(log_stdout);
 }
@@ -162,7 +166,7 @@ void log_notice(const char *fmt, ...) {
   get_logstring(buf, log_style, "notice", fmt);
 
   va_start(args, fmt);
-  vfprintf(log_stdout, buf, args);  // intentionally do not check return value, since there's nothing we can do about it
+  vfprintf(log_stdout, buf, args);
   va_end(args);
   fflush(log_stdout);
 }
@@ -190,7 +194,7 @@ void log_always(const char *fmt, ...) {
   get_logstring(buf, log_style, "always", fmt);
 
   va_start(args, fmt);
-  vfprintf(log_stdout, buf, args);  // intentionally do not check return value, since there's nothing we can do about it
+  vfprintf(log_stdout, buf, args);
   va_end(args);
   fflush(log_stdout);
 }
@@ -244,16 +248,16 @@ char* get_logstring(char *buf, logStyle_e log_style, const char *log_level, cons
         tm = localtime(&t);
         sprintf(buf, "(PID %d) | %02d:%02d:%02d | %-7s | %s", \
                   getpid(), tm->tm_hour, tm->tm_min, tm->tm_sec, \
-                  to_upper(log_level, level, strlen(log_level)), fmt);
+                  to_upper(log_level, level), fmt);
       } break;
       default: break;
     }
     return buf;
 }
 
-char* to_upper(const char *in, char *buf, int len) {
+char* to_upper(const char *in, char *buf) {
 
-  for (int i = 0; i < len; i++) {
+  for (size_t i = 0; i < strlen(in); i++) {
     if ((in[i] < ASCII_LOWER_START) || (in[i] > ASCII_LOWER_END)) continue;
     buf[i] = (in[i] - 32);
   }
