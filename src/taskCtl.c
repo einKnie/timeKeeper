@@ -19,6 +19,8 @@ int        g_taskInit = 0;
 
 void initTasks() {
 
+  log_debug("initializing tasks\n");
+
   for (int i = 0; i < MAX_IDX; i++) {
     g_tasks.task[i].id      = (i + 1);
     g_tasks.task[i].active  = 0;
@@ -32,6 +34,7 @@ void initTasks() {
 
 int switchToTask(int idx) {
   int ret = 0;
+  log_debug("switch from task %d to task %d\n", g_tasks.active, idx);
 
   // stop active task
   if (g_tasks.active != 0) {
@@ -185,7 +188,7 @@ int getCumTaskTime(char *buf, size_t n) {
 
 int stopTask(int idx) {
 
-  log_notice("stopping task %d\n", idx);
+  log_debug("stopping task %d\n", idx);
 
   if (idx != g_tasks.active) {
     log_debug("not stopping an already stopped task\n");
@@ -206,7 +209,7 @@ int stopTask(int idx) {
 
 int startTask(int idx) {
 
-  log_notice("starting task %d\n", idx);
+  log_debug("starting task %d\n", idx);
 
   if (idx == g_tasks.active) {
     log_debug("not starting active task again\n");
