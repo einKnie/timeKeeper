@@ -51,7 +51,7 @@ int initIpc(int daemon) {
 }
 
 int exitIpc() {
-  if (! g_initQueue) {
+  if (!g_initQueue) {
     log_debug("queue not initialized. doing nothing...\n");
     return 1;
   }
@@ -68,7 +68,7 @@ int exitIpc() {
 
 int waitForMsg(struct msg *message) {
 
-  if (! g_initQueue) {
+  if (!g_initQueue) {
     log_debug("queue not initialized. doing nothing...\n");
     return 0;
   }
@@ -86,7 +86,7 @@ int waitForMsg(struct msg *message) {
 
 int sendMsg(struct msg message) {
 
-  if (! g_initQueue) {
+  if (!g_initQueue) {
     log_debug("queue not initialized. doing nothing...\n");
     return 0;
   }
@@ -106,9 +106,9 @@ int handleMsg(struct msg message) {
 
   switch(message.type) {
     case EStartCtr:
-      if (! taskHasName(message.idx)) {
+      if (!taskHasName(message.idx)) {
         char in[MAX_TEXT] = "\0";
-        if (! getInput("Task name:", in, sizeof(in))) {
+        if (!getInput("Task name:", in, sizeof(in))) {
           break;
         }
         setTaskName(message.idx, in);

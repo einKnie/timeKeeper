@@ -95,7 +95,7 @@ void daemonize() {
   }
 
   log_always("Rerouting all output to logfile at %s\n", g_logfile);
-  if (! rerouteLog()) {
+  if (!rerouteLog()) {
     // close all file descriptors
     log_warning("Failed to reroute stdin&&stdout\n logging disabled\n");
     int x;
