@@ -13,8 +13,8 @@
 #include <unistd.h>
 #include <signal.h>
 #include <sys/stat.h>
-#include "timeKeeper.h"
-#include "procCtl.h"
+#include "timekeeper.h"
+#include "proc_ctl.h"
 
 int checkPidFile(const char *pidfile) {
   int ret = 0;

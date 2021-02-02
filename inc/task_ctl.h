@@ -9,7 +9,7 @@
 #define _TASK_CTL_H_
 
 #include <time.h>
-#include "timeKeeper.h"
+#include "timekeeper.h"
 
 typedef struct task {
   int     id;             ///< task id

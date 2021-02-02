@@ -10,8 +10,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include "ipcCtl.h"
-#include "taskCtl.h"
+#include "ipc_ctl.h"
+#include "task_ctl.h"
 #include "ui.h"
 
 struct msgQueue {

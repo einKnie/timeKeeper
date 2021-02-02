@@ -9,7 +9,7 @@
 #define _IPC_CTL_H_
 
 #include <sys/ipc.h>
-#include "timeKeeper.h"
+#include "timekeeper.h"
 
 enum opType {
   ENone = 0,

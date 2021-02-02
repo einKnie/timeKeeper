@@ -10,10 +10,10 @@
 #include <string.h>
 #include <unistd.h>
 #include <signal.h>
-#include "timeKeeper.h"
-#include "procCtl.h"
-#include "ipcCtl.h"
-#include "taskCtl.h"
+#include "timekeeper.h"
+#include "proc_ctl.h"
+#include "ipc_ctl.h"
+#include "task_ctl.h"
 #include "ui.h"
 
 void cleanup(void);
@@ -21,7 +21,7 @@ void sigHdl(const int signum);
 void printHelp();
 int  validateIdx(int idx, int optional);
 
-// declared as extern in timeKeeper.h
+// declared as extern in timekeeper.h
 char g_pidfile[PATH_MAX]  = "\0";
 char g_savefile[PATH_MAX] = "\0";
 char g_logfile[PATH_MAX]  = "\0";

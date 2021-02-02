@@ -8,7 +8,7 @@
 #ifndef _UI_H_
 #define _UI_H_
 
-#include "timeKeeper.h"
+#include "timekeeper.h"
 
 /// Send a notification
 /// @param [in] text

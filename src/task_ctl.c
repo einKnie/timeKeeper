@@ -11,7 +11,7 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <errno.h>
-#include "taskCtl.h"
+#include "task_ctl.h"
 #include "ui.h"
 
 taskData_t g_tasks;
