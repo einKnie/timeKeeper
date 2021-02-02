@@ -91,7 +91,7 @@ int sendMsg(struct msg message) {
     return 0;
   }
 
-  if ((msgsnd(g_msgQueue.id, &message, sizeof(message), 0)) < 0) {
+  if ((msgsnd(g_msgQueue.id, &message, sizeof(message.text), 0)) < 0) {
     log_error("failed to send message: %s\n", strerror(errno));
     return 0;
   } else {

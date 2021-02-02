@@ -21,9 +21,17 @@ enum opType {
   EQuit
 };
 
-/// type: type of operation
-/// idx: which task
-/// text: additional data
+/* type: type of operation
+ * idx: which task
+ * text: additional data
+ *
+ * note: this is a bit hacky, since msgsend(...) requires that
+ * the send structr has a long int (must be > 0) and a buffer.
+ * the size of the buffer alone must be given as msgsz argument. by
+ * having two ints here, we can simluate the required long
+ * and transmit more data (two flags instead of one) in the meantime.
+ * but: this also means that not both type and idx can be 0 at the same time
+ */
 struct msg {
   int  type;
   int  idx;
