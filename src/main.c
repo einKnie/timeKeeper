@@ -16,6 +16,12 @@
 #include "task_ctl.h"
 #include "ui.h"
 
+enum {
+	IDX_FORBIDDEN = -1,
+	IDX_OPTIONAL  =  0,
+	IDX_REQUIRED  =  1
+};
+
 void cleanup(void);
 void sigHdl(const int signum);
 void printHelp();
@@ -87,26 +93,26 @@ int main(int argc, char **argv) {
   switch (type) {
     case EStartCtr:
     case ESetName:
-      if (!validateIdx(idx, 1)) {
+      if (!validateIdx(idx, IDX_REQUIRED)) {
         err++;
         log_error("task must be supplied in range %d-%d\n", MIN_IDX, MAX_IDX);
       }
       break;
     case ESave:
     case EShowInfo:
-      if (!validateIdx(idx, 0)) {
+      if (!validateIdx(idx, IDX_OPTIONAL)) {
         err++;
       }
       break;
     case EQuit:
     case EEndCtr:
-      if (!validateIdx(idx, -1)) {
+      if (!validateIdx(idx, IDX_FORBIDDEN)) {
         err++;
         log_error("Invalid option -t in combination with other option\n");
       }
       break;
     case ENone:
-      if (!validateIdx(idx, -1)) {
+      if (!validateIdx(idx, IDX_FORBIDDEN)) {
         err++;
         log_error("no action specified for task %d\n", idx);
       }
@@ -259,9 +265,9 @@ void printHelp() {
 
 /*  Check if provided index is valid
  *  param optional:
- *    -1 ... idx must not be set (i.e. == 0)
- *     0 ... idx may be 0
- *     1 ... idx must be set (i.e. != 0)
+ *    -1 (IDX_FORBIDDEN) ... idx must not be set (i.e. == 0)
+ *     0 (IDX_OPTIONAL)  ... idx may be 0
+ *     1 (IDX_REQUIRED)  ... idx must be set (i.e. != 0)
 */
 int validateIdx(int idx, int optional) {
   int err = 0;
@@ -274,13 +280,13 @@ int validateIdx(int idx, int optional) {
 
   if (idx == 0) {
     // not set
-    if (optional <= 0) {
+    if (optional <= IDX_OPTIONAL) {
       // not set && not required
       return 1;
     }
   } else {
     // set
-    if ((optional >= 0) && !err) {
+    if ((optional >= IDX_OPTIONAL) && !err) {
       // allowed && correct
       return 1;
     }
