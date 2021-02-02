@@ -12,16 +12,16 @@
 #include "timekeeper.h"
 
 typedef struct task {
-  int     id;             ///< task id
-  int     active;         ///< is task running
-  char    name[MAX_TEXT]; ///< task name
-  time_t  start;          ///< current task start time (if running)
-  time_t  cum;            ///< cumulated task runtime
+	int     id;             ///< task id
+	int     active;         ///< is task running
+	char    name[MAX_TEXT]; ///< task name
+	time_t  start;          ///< current task start time (if running)
+	time_t  cum;            ///< cumulated task runtime
 } task_t; ///< data of a single task
 
 typedef struct taskData {
-  int    active;          ///< id of active task
-  task_t task[MAX_IDX];   ///< tasks
+	int    active;          ///< id of active task
+	task_t task[MAX_IDX];   ///< tasks
 } taskData_t; ///< collective task data
 
 

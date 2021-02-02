@@ -21,72 +21,72 @@ FILE *log_stdout = NULL;
 /// @return ENoErr on success, EErr on failure
 int log_init(logLevel_e level, logStyle_e style, const char* logfile) {
 
-  if (!log_exit()) {
-    if (fprintf(stdout, "Failed to discard previous logger settings") < 0) {
-      fprintf(stderr, "Failed to print to stdout");
-    }
-    return EErr;
-  }
+	if (!log_exit()) {
+		if (fprintf(stdout, "Failed to discard previous logger settings") < 0) {
+			fprintf(stderr, "Failed to print to stdout");
+		}
+		return EErr;
+	}
 
-  if (level <= ELogDebug) {
-    log_level = level;
-  }
+	if (level <= ELogDebug) {
+		log_level = level;
+	}
 
-  if (style <= ELogStyleVerbose) {
-    log_style = style;
-  }
+	if (style <= ELogStyleVerbose) {
+		log_style = style;
+	}
 
-  if (logfile == NULL) {
-    log_stdout = stdout;
-  } else {
-    log_stdout = fopen(logfile, "w");
-    if (log_stdout == NULL) {
-      log_stdout = stdout;
-      log_error("Failed to reroute logging to file @ %s: %s", logfile, errno);
-      return EErr;
-    }
-  }
+	if (logfile == NULL) {
+		log_stdout = stdout;
+	} else {
+		log_stdout = fopen(logfile, "w");
+		if (log_stdout == NULL) {
+			log_stdout = stdout;
+			log_error("Failed to reroute logging to file @ %s: %s", logfile, errno);
+			return EErr;
+		}
+	}
 
-  return ENoErr;
+	return ENoErr;
 }
 
 void log_reinit(int level, int style) {
 
-  if ((level != -1) && (level <= ELogDebug)) {
-    log_level = level;
-  }
+	if ((level != -1) && (level <= ELogDebug)) {
+		log_level = level;
+	}
 
-  if ((style != -1) && (style <= ELogStyleVerbose)) {
-    log_style = style;
-  }
+	if ((style != -1) && (style <= ELogStyleVerbose)) {
+		log_style = style;
+	}
 }
 
 /// @brief Cleanup logger. Close any open file descriptors and reset log_stdout to NULL
 /// @return ENoErr on success, EErr otherwise
 int log_exit() {
 
-  int ret = 0;
+	int ret = 0;
 
-  if (log_stdout == NULL)
-    return ENoErr;
+	if (log_stdout == NULL)
+	return ENoErr;
 
-  log_level = ELogError;
-  log_style = ELogStyleMinimal;
+	log_level = ELogError;
+	log_style = ELogStyleMinimal;
 
-  // close log_stdout
-  if (log_stdout == stdout) {
-    log_stdout = NULL;
-  } else {
-    ret = fclose(log_stdout);
-    if (ret != 0) {
-      log_error("Failed to close stdout logfile");
-    } else {
-      log_debug("Successfully closed stdout logfile");
-    }
-    log_stdout = NULL;
-  }
+	// close log_stdout
+	if (log_stdout == stdout) {
+		log_stdout = NULL;
+	} else {
+		ret = fclose(log_stdout);
+		if (ret != 0) {
+			log_error("Failed to close stdout logfile");
+		} else {
+			log_debug("Successfully closed stdout logfile");
+		}
+		log_stdout = NULL;
+	}
 
-  return (ret == 0) ? ENoErr : EErr;
+	return (ret == 0) ? ENoErr : EErr;
 }
 
 /// @brief print an error message to stderr
@@ -94,27 +94,27 @@ int log_exit() {
 /// @param ... option specifiers for string
 void log_error(const char *fmt, ...) {
 
-  if (log_stdout == NULL)
-    return;
+	if (log_stdout == NULL)
+	return;
 
-  char buf[MAX_LINE_LEN];
-  va_list args;
+	char buf[MAX_LINE_LEN];
+	va_list args;
 
-  switch(log_level) {
-    case ELogDisable: return;
-    case ELogError:   break;
-    case ELogWarn   : break;
-    case ELogVerbose: break;
-    case ELogDebug:   break;
-    default: return;
-  }
+	switch(log_level) {
+		case ELogDisable: return;
+		case ELogError:   break;
+		case ELogWarn   : break;
+		case ELogVerbose: break;
+		case ELogDebug:   break;
+		default: return;
+	}
 
-  get_logstring(buf, log_style, "error", fmt);
+	get_logstring(buf, log_style, "error", fmt);
 
-  va_start(args, fmt);
-  vfprintf(log_stdout, buf, args);
-  va_end(args);
-  fflush(log_stdout);
+	va_start(args, fmt);
+	vfprintf(log_stdout, buf, args);
+	va_end(args);
+	fflush(log_stdout);
 }
 
 /// @brief print a warning message to stdout
@@ -122,27 +122,27 @@ void log_error(const char *fmt, ...) {
 /// @param ... option specifiers for string
 void log_warning(const char *fmt, ...) {
 
-  if (log_stdout == NULL)
-    return;
+	if (log_stdout == NULL)
+	return;
 
-  char buf[MAX_LINE_LEN];
-  va_list args;
+	char buf[MAX_LINE_LEN];
+	va_list args;
 
-  switch(log_level) {
-    case ELogDisable: return;
-    case ELogError:   return;
-    case ELogWarn   : break;
-    case ELogVerbose: break;
-    case ELogDebug:   break;
-    default: return;
-  }
+	switch(log_level) {
+		case ELogDisable: return;
+		case ELogError:   return;
+		case ELogWarn   : break;
+		case ELogVerbose: break;
+		case ELogDebug:   break;
+		default: return;
+	}
 
-  get_logstring(buf, log_style, "warning", fmt);
+	get_logstring(buf, log_style, "warning", fmt);
 
-  va_start(args, fmt);
-  vfprintf(log_stdout, buf, args);
-  va_end(args);
-  fflush(log_stdout);
+	va_start(args, fmt);
+	vfprintf(log_stdout, buf, args);
+	va_end(args);
+	fflush(log_stdout);
 }
 
 /// @brief print a notice to stdout
@@ -150,27 +150,27 @@ void log_warning(const char *fmt, ...) {
 /// @param ... option specifiers for string
 void log_notice(const char *fmt, ...) {
 
-  if (log_stdout == NULL)
-    return;
+	if (log_stdout == NULL)
+	return;
 
-  char buf[MAX_LINE_LEN];
-  va_list args;
+	char buf[MAX_LINE_LEN];
+	va_list args;
 
-  switch(log_level) {
-    case ELogDisable: return;
-    case ELogError:   return;
-    case ELogWarn   : return;
-    case ELogVerbose: break;
-    case ELogDebug:   break;
-    default: return;
-  }
+	switch(log_level) {
+		case ELogDisable: return;
+		case ELogError:   return;
+		case ELogWarn   : return;
+		case ELogVerbose: break;
+		case ELogDebug:   break;
+		default: return;
+	}
 
-  get_logstring(buf, log_style, "notice", fmt);
+	get_logstring(buf, log_style, "notice", fmt);
 
-  va_start(args, fmt);
-  vfprintf(log_stdout, buf, args);
-  va_end(args);
-  fflush(log_stdout);
+	va_start(args, fmt);
+	vfprintf(log_stdout, buf, args);
+	va_end(args);
+	fflush(log_stdout);
 }
 
 /// @brief print a always to stdout
@@ -178,27 +178,27 @@ void log_notice(const char *fmt, ...) {
 /// @param ... option specifiers for string
 void log_always(const char *fmt, ...) {
 
-  if (log_stdout == NULL)
-    return;
+	if (log_stdout == NULL)
+	return;
 
-  char buf[MAX_LINE_LEN];
-  va_list args;
+	char buf[MAX_LINE_LEN];
+	va_list args;
 
-  switch(log_level) {
-    case ELogDisable: return;
-    case ELogError:   break;
-    case ELogWarn   : break;
-    case ELogVerbose: break;
-    case ELogDebug:   break;
-    default: return;
-  }
+	switch(log_level) {
+		case ELogDisable: return;
+		case ELogError:   break;
+		case ELogWarn   : break;
+		case ELogVerbose: break;
+		case ELogDebug:   break;
+		default: return;
+	}
 
-  get_logstring(buf, log_style, "always", fmt);
+	get_logstring(buf, log_style, "always", fmt);
 
-  va_start(args, fmt);
-  vfprintf(log_stdout, buf, args);
-  va_end(args);
-  fflush(log_stdout);
+	va_start(args, fmt);
+	vfprintf(log_stdout, buf, args);
+	va_end(args);
+	fflush(log_stdout);
 }
 
 /// @brief print a debug message to stdout
@@ -206,62 +206,62 @@ void log_always(const char *fmt, ...) {
 /// @param ... option specifiers for string
 void log_debug(const char *fmt, ...) {
 
-  if (log_stdout == NULL)
-    return;
+	if (log_stdout == NULL)
+	return;
 
-  char buf[MAX_LINE_LEN];
-  va_list args;
+	char buf[MAX_LINE_LEN];
+	va_list args;
 
-  switch(log_level) {
-    case ELogDisable: return;
-    case ELogError:   return;
-    case ELogWarn   : return;
-    case ELogVerbose: return;
-    case ELogDebug:   break;
-    default: return;
-  }
+	switch(log_level) {
+		case ELogDisable: return;
+		case ELogError:   return;
+		case ELogWarn   : return;
+		case ELogVerbose: return;
+		case ELogDebug:   break;
+		default: return;
+	}
 
-  get_logstring(buf, log_style, "debug", fmt);
+	get_logstring(buf, log_style, "debug", fmt);
 
-  //TODO: test this code && if it works: copy to all other functions
-  va_start(args, fmt);
-  if (vfprintf(log_stdout, buf, args) < 0) {
-    va_end(args);
-    if (log_stdout != stdout) {
-      fprintf(stdout, "error | Logging to file failed. Rerouting to stdout...");
-      fclose(log_stdout);
-      log_stdout = stdout;
-    }
-  }
-  va_end(args);
-  fflush(log_stdout);
+	//TODO: test this code && if it works: copy to all other functions
+	va_start(args, fmt);
+	if (vfprintf(log_stdout, buf, args) < 0) {
+		va_end(args);
+		if (log_stdout != stdout) {
+			fprintf(stdout, "error | Logging to file failed. Rerouting to stdout...");
+			fclose(log_stdout);
+			log_stdout = stdout;
+		}
+	}
+	va_end(args);
+	fflush(log_stdout);
 }
 
 char* get_logstring(char *buf, logStyle_e log_style, const char *log_level, const char *fmt) {
-    switch(log_style) {
-      case ELogStyleNone: sprintf(buf, "%s", fmt); break;
-      case ELogStyleMinimal: sprintf(buf, "%-7s | %s", log_level, fmt); break;
-      case ELogStyleVerbose: {
-        //get time
-        char level[30] = {'\0'};
-        time_t t;
-        struct tm *tm;
-        time(&t);
-        tm = localtime(&t);
-        sprintf(buf, "(PID %d) | %02d:%02d:%02d | %-7s | %s", \
-                  getpid(), tm->tm_hour, tm->tm_min, tm->tm_sec, \
-                  to_upper(log_level, level), fmt);
-      } break;
-      default: break;
-    }
-    return buf;
+	switch(log_style) {
+		case ELogStyleNone: sprintf(buf, "%s", fmt); break;
+		case ELogStyleMinimal: sprintf(buf, "%-7s | %s", log_level, fmt); break;
+		case ELogStyleVerbose: {
+			//get time
+			char level[30] = {'\0'};
+			time_t t;
+			struct tm *tm;
+			time(&t);
+			tm = localtime(&t);
+			sprintf(buf, "(PID %d) | %02d:%02d:%02d | %-7s | %s", \
+			getpid(), tm->tm_hour, tm->tm_min, tm->tm_sec, \
+			to_upper(log_level, level), fmt);
+		} break;
+		default: break;
+	}
+	return buf;
 }
 
 char* to_upper(const char *in, char *buf) {
 
-  for (size_t i = 0; i < strlen(in); i++) {
-    if ((in[i] < ASCII_LOWER_START) || (in[i] > ASCII_LOWER_END)) continue;
-    buf[i] = (in[i] - 32);
-  }
-  return buf;
+	for (size_t i = 0; i < strlen(in); i++) {
+		if ((in[i] < ASCII_LOWER_START) || (in[i] > ASCII_LOWER_END)) continue;
+		buf[i] = (in[i] - 32);
+	}
+	return buf;
 }
