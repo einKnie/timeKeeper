@@ -28,11 +28,13 @@ int log_init(logLevel_e level, logStyle_e style, const char* logfile) {
     return EErr;
   }
 
-  if (level <= ELogDebug)
+  if (level <= ELogDebug) {
     log_level = level;
+  }
 
-  if (style <= ELogStyleVerbose)
+  if (style <= ELogStyleVerbose) {
     log_style = style;
+  }
 
   if (logfile == NULL) {
     log_stdout = stdout;

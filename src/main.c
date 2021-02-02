@@ -125,7 +125,9 @@ int main(int argc, char **argv) {
   }
 
   // set updated loglevel
-  log_init(log_level, DEFAULT_LOGSTYLE, NULL);
+  if (log_level != DEFAULT_LOGLEVEL) {
+    log_reinit(log_level, DEFAULT_LOGSTYLE);
+  }
 
   // prepare message
   struct msg message;
