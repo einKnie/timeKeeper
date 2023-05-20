@@ -16,16 +16,16 @@
 #include "task_ctl.h"
 #include "ui.h"
 
-enum {
+typedef enum {
 	IDX_FORBIDDEN = -1,
 	IDX_OPTIONAL  =  0,
 	IDX_REQUIRED  =  1
-};
+} idxrules_e;
 
 void cleanup(void);
 void sigHdl(const int signum);
 void printHelp();
-int  validateIdx(int idx, int optional);
+int  validateIdx(int idx, idxrules_e rules);
 
 // declared as extern in timekeeper.h
 char g_pidfile[PATH_MAX]  = "\0";
@@ -93,26 +93,26 @@ int main(int argc, char **argv) {
 	switch (type) {
 		case EStartCtr:
 		case ESetName:
-			if (!validateIdx(idx, IDX_REQUIRED)) {
+			if (validateIdx(idx, IDX_REQUIRED) != 0) {
 				err++;
 				log_error("task must be supplied in range %d-%d\n", MIN_IDX, MAX_IDX);
 			}
 			break;
 		case ESave:
 		case EShowInfo:
-			if (!validateIdx(idx, IDX_OPTIONAL)) {
+			if (validateIdx(idx, IDX_OPTIONAL) != 0) {
 				err++;
 			}
 			break;
 		case EQuit:
 		case EEndCtr:
-			if (!validateIdx(idx, IDX_FORBIDDEN)) {
+			if (validateIdx(idx, IDX_FORBIDDEN) != 0) {
 				err++;
 				log_error("Invalid option -t in combination with other option\n");
 			}
 			break;
 		case ENone:
-			if (!validateIdx(idx, IDX_FORBIDDEN)) {
+			if (validateIdx(idx, IDX_FORBIDDEN) != 0) {
 				err++;
 				log_error("no action specified for task %d\n", idx);
 			}
@@ -264,12 +264,12 @@ void printHelp() {
 }
 
 /*  Check if provided index is valid
-*  param optional:
+*  param rules:
 *    -1 (IDX_FORBIDDEN) ... idx must not be set (i.e. == 0)
 *     0 (IDX_OPTIONAL)  ... idx may be 0
 *     1 (IDX_REQUIRED)  ... idx must be set (i.e. != 0)
 */
-int validateIdx(int idx, int optional) {
+int validateIdx(int idx, idxrules_e rules) {
 	int err = 0;
 
 	if ((idx != 0) && ((idx < MIN_IDX) || (idx > MAX_IDX))) {
@@ -280,17 +280,17 @@ int validateIdx(int idx, int optional) {
 
 	if (idx == 0) {
 		// not set
-		if (optional <= IDX_OPTIONAL) {
+		if (rules <= IDX_OPTIONAL) {
 			// not set && not required
-			return 1;
+			return 0;
 		}
 	} else {
 		// set
-		if ((optional >= IDX_OPTIONAL) && !err) {
+		if ((rules >= IDX_OPTIONAL) && !err) {
 			// allowed && correct
-			return 1;
+			return 0;
 		}
 	}
 
-	return 0;
+	return 1;
 }
