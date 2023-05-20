@@ -184,7 +184,7 @@ int main(int argc, char **argv) {
 		break;
 	} while (1);
 
-	if (!initIpc(g_isDaemon)) {
+	if (initIpc(g_isDaemon) != 1) {
 		log_error("failed to initialize message queue\n");
 		exit(1);
 	}
@@ -198,7 +198,7 @@ int main(int argc, char **argv) {
 
 		while (1) {
 			// daemon loop: wait for ipc here
-			if (waitForMsg(&message)) {
+			if (waitForMsg(&message) == 0) {
 				handleMsg(message);
 			}
 		}
@@ -225,7 +225,7 @@ void cleanup(void) {
 		switchToTask(0);
 		storeTaskData(0, g_savefile);
 
-		if (!exitIpc()) {
+		if (exitIpc() != 0) {
 			log_error("failed to remove message queue\n");
 		}
 		if (!cleanupPidFile(g_pidfile)) {

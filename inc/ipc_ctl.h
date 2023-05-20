@@ -40,26 +40,26 @@ struct msg {
 
 /// Initialize msgQueue
 /// @param [in] daemon 1 if daemon process, 0 if client
-/// @return 0 on error, 1 on success
+/// @return status of queue, 1 if initialized, 0 if initialization failed
 int initIpc(int daemon);
 
 /// Close && cleanup msgQueue
-/// @return 0 on error, 1 on success
+/// @return 0 on success, 1 on error
 int exitIpc();
 
 /// Wait for a message via msgQueue
 /// @param [in,out] message holds received message after successful call
-/// @return 0 on error, 1 on success
+/// @return 0 on success, 1 on error
 int waitForMsg(struct msg *message);
 
 /// Send a message via msgQueue
 /// @param [in] message
-/// @return 0 on error, 1 on success
+/// @return 0 on success, 1 on error
 int sendMsg(struct msg message);
 
 /// Handle a message
 /// @param [in] message
-/// @return 0 on error, 1 on success
+/// @return 0 on success, 1 on error
 int handleMsg(struct msg message);
 
 #endif

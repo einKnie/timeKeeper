@@ -24,7 +24,7 @@ int initIpc(int daemon) {
 
 	if (g_initQueue) {
 		log_debug("queue already initialized. doing nothing\n");
-		return 1;
+		return g_initQueue;
 	}
 
 	int   msgid = 0;
@@ -53,34 +53,34 @@ int initIpc(int daemon) {
 int exitIpc() {
 	if (!g_initQueue) {
 		log_debug("queue not initialized. doing nothing...\n");
-		return 1;
+		return 0;
 	}
 
 	// remove queue
 	if (msgctl(g_msgQueue.id, IPC_RMID, NULL) < 0) {
 		log_error("failed to remove msgqueue: %s\n", strerror(errno));
-		return 0;
+		return 1;
 	}
 
 	log_notice("removed message queue\n");
-	return 1;
+	return 0;
 }
 
 int waitForMsg(struct msg *message) {
 
 	if (!g_initQueue) {
 		log_debug("queue not initialized. doing nothing...\n");
-		return 0;
+		return 1;
 	}
 
 	if ((msgrcv(g_msgQueue.id, message, sizeof(*message), 0, 0)) < 0) {
 		log_error("failed to receive message: %s\n", strerror(errno));
-		return 0;
+		return 1;
 	} else {
 		log_notice("received message\n");
 		log_debug("type: %d\nidx: %d\ntext: %s\n", \
 			message->type, message->idx, message->text);
-		return 1;
+		return 0;
 	}
 }
 
@@ -88,15 +88,15 @@ int sendMsg(struct msg message) {
 
 	if (!g_initQueue) {
 		log_debug("queue not initialized. doing nothing...\n");
-		return 0;
+		return 1;
 	}
 
 	if ((msgsnd(g_msgQueue.id, &message, sizeof(message.text), 0)) < 0) {
 		log_error("failed to send message: %s\n", strerror(errno));
-		return 0;
+		return 1;
 	} else {
 		log_debug("sent message\n");
-		return 1;
+		return 0;
 	}
 }
 
@@ -135,8 +135,8 @@ int handleMsg(struct msg message) {
 			exit(0);
 		default:
 			log_debug("invalid message received\n");
-			return 0;
+			return 1;
 	}
 
-	return 1;
+	return 0;
 }
