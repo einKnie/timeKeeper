@@ -37,12 +37,15 @@ void switchToTask(int idx) {
 
 	// stop active task
 	if (g_tasks.active != 0) {
+		int idx = g_tasks.active;
 		stopTask(g_tasks.active);
+		notifyTaskStop(idx, g_tasks.task[idx-1].name);
 	}
 
 	if (idx > 0) {
 		// start a specific task
 		startTask(idx);
+		notifyTaskStart(idx, g_tasks.task[idx-1].name);
 	}
 }
 
