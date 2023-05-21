@@ -12,7 +12,7 @@
 #include "log.h"
 
 #define VERSION 1
-#define MINVERSION 1
+#define MINVERSION 2
 
 #define MAX_TEXT 100
 
