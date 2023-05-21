@@ -166,15 +166,15 @@ int main(int argc, char **argv) {
 			log_notice("no daemon found, becoming the new daemon!\n");
 			daemonize();
 			g_isDaemon = 1;
-			if (!createPidFile(g_pidfile)) {
+			if (createPidFile(g_pidfile) != 0) {
 				log_error("failed to create pid file\n");
 				exit(1);
 			}
 		} else {
 			log_notice("got pid of daemon: %d\n", pid);
-			if (!checkProcess(pid)) {
+			if (checkProcess(pid) != 0) {
 				log_notice("daemon not found: cleaning up\n");
-				if (!cleanupPidFile(g_pidfile)) {
+				if (cleanupPidFile(g_pidfile) != 0) {
 					log_error("failed to remove pidfile\n");
 					exit(1);
 				}
@@ -228,7 +228,7 @@ void cleanup(void) {
 		if (exitIpc() != 0) {
 			log_error("failed to remove message queue\n");
 		}
-		if (!cleanupPidFile(g_pidfile)) {
+		if (cleanupPidFile(g_pidfile) != 0) {
 			log_error("failed to remove pid file at: %s\n", g_pidfile);
 		}
 	}

@@ -15,24 +15,24 @@ int checkPidFile(const char *pidfile);
 
 /// Check if a process is running by pid
 /// @param [in] pid
-/// @return 0 if process is not running, 1 if it is
+/// @return 0 if process is running, 1 if it is not
 int checkProcess(int pid);
 
 /// Create a pidfile
 /// @param [in] pidfile path
-/// @return 0 on failure, 1 on success
+/// @return 0 on success, !0 on error
 int createPidFile(const char *pidfile);
 
 /// Remove a pidfile
 /// @param [in] pidfile path
-/// @return 0 on failure, 1 on success
+/// @return 0 on success, 1 on error
 int cleanupPidFile(const char *pidfile);
 
 /// Daemonize process
 void daemonize();
 
 /// Reroute stdout&&stderr to logfile
-/// @return 0 on failure, 1 on success
+/// @return 0 on success, 1 on error
 int rerouteLog();
 
 #endif

@@ -46,7 +46,7 @@ int checkProcess(int pid) {
 
 	snprintf(outbuf, sizeof(outbuf), "ps -p %d &>/dev/null", pid);
 	ret = system(outbuf);
-	return (ret == 0 ? 1 : 0);
+	return ret;
 }
 
 int createPidFile(const char *pidfile) {
@@ -57,29 +57,32 @@ int createPidFile(const char *pidfile) {
 
 	if ((fd = open(pidfile, O_CREAT | O_RDWR, 0644)) < 0) {
 		log_error("%s\n", strerror(errno));
-		return ret;
+		return 1;
 	}
 
 	sprintf(buf, "%d", pid);
 	if (write(fd, buf, sizeof(buf)) < 0) {
 		log_error("%s\n", strerror(errno));
-		ret = 0;
+		ret++;
 	} else {
 		log_notice("Created pid file\n");
-		ret = 1;
 	}
 
-	close(fd);
+	if (close(fd) < 0) {
+		log_error("failed to close pidfile\n");
+		ret++;
+	}
+
 	return ret;
 }
 
 int cleanupPidFile(const char *pidfile) {
 	if (remove(pidfile) < 0) {
 		log_error("failed to remove pid file\n");
-		return 0;
+		return 1;
 	} else {
 		log_notice("removed pid file\n");
-		return 1;
+		return 0;
 	}
 }
 
@@ -95,7 +98,7 @@ void daemonize() {
 	}
 
 	log_always("Rerouting all output to logfile at %s\n", g_logfile);
-	if (!rerouteLog()) {
+	if (rerouteLog() != 0) {
 		// close all file descriptors
 		log_warning("Failed to reroute stdin&&stdout\n logging disabled\n");
 		int x;
@@ -127,12 +130,12 @@ void daemonize() {
 int rerouteLog() {
 	if (g_logfd < 0) {
 		if ((g_logfd = open(g_logfile, O_CREAT | O_APPEND | O_WRONLY, 0644)) < 0) {
-			return 0;
+			return 1;
 		}
 
 		dup2(g_logfd, STDOUT_FILENO);
 		dup2(g_logfd, STDERR_FILENO);
-		return 1;
+		return 0;
 	}
-	return 0;
+	return 1;
 }
