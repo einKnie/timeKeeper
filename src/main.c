@@ -190,7 +190,7 @@ int main(int argc, char **argv) {
 	}
 
 	if (g_isDaemon) {
-		notify("Daemon running", 5);
+		notify("Daemon running", INFO_TIMEOUT);
 		initTasks();
 
 		// in case daemon was started w/ args, process them
@@ -219,7 +219,7 @@ void sigHdl(const int signum) {
 void cleanup(void) {
 	if (g_isDaemon) {
 
-		notify("Shutting down", 5);
+		notify("Shutting down", INFO_TIMEOUT);
 
 		// cleanup tasks
 		switchToTask(0);

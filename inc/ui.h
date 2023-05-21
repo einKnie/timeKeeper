@@ -10,6 +10,9 @@
 
 #include "timekeeper.h"
 
+#define TASK_DATA_TIMEOUT  10
+#define INFO_TIMEOUT       4
+
 /// Send a notification
 /// @param [in] text
 /// @param [in] t notification timeout in seconds [ 0 == no timeout ]

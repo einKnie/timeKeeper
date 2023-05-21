@@ -65,7 +65,7 @@ void showTaskData(int idx) {
 	getStringFromIndex(idx, buf, sizeof(buf));
 	getCumTaskTime(buf + strlen(buf), MAX_TEXT);
 
-	notify(buf, 0);
+	notify(buf, TASK_DATA_TIMEOUT);
 }
 
 void getStringFromIndex(int idx, char *buf, size_t n) {
