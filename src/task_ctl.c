@@ -32,8 +32,7 @@ void initTasks() {
 	g_taskInit = 1;
 }
 
-int switchToTask(int idx) {
-	int ret = 0;
+void switchToTask(int idx) {
 	log_debug("switch from task %d to task %d\n", g_tasks.active, idx);
 
 	// stop active task
@@ -45,35 +44,31 @@ int switchToTask(int idx) {
 		// start a specific task
 		startTask(idx);
 	}
-
-	return ret;
 }
 
 int taskHasName(int idx) {
+	if (--idx < 0) return -1;
 
-	if (--idx < 0) return 0;
-
-	return (strlen(g_tasks.task[idx].name) > 0);
+	return strlen(g_tasks.task[idx].name);
 }
 
 int setTaskName(int idx, const char *name) {
-	if (--idx < 0) return 0;
+	if (--idx < 0) return -1;
 
 	strncpy(g_tasks.task[idx].name, name, sizeof(g_tasks.task[idx].name));
-	return 1;
+	return 0;
 }
 
-int showTaskData(int idx) {
+void showTaskData(int idx) {
 	char buf[MAX_TEXT * (TASKS * 2)] = "\0";
 
-	getTaskData(idx, buf, sizeof(buf));
+	getStringFromIndex(idx, buf, sizeof(buf));
 	getCumTaskTime(buf + strlen(buf), MAX_TEXT);
 
 	notify(buf, 0);
-	return 1;
 }
 
-int getTaskData(int idx, char *buf, size_t n) {
+void getStringFromIndex(int idx, char *buf, size_t n) {
 	size_t offs = 0;
 	int i = 0;
 	int j = MAX_IDX;
@@ -85,61 +80,12 @@ int getTaskData(int idx, char *buf, size_t n) {
 
 	for (; i < j; i++) {
 		task_t *t = &(g_tasks.task[i]);
-		getTaskString(t, buf + offs, (n > offs) ? n - offs: 0);
+		getStringFromTask(t, buf + offs, (n > offs) ? n - offs: 0);
 		offs = strlen(buf);
 	}
-
-	return 1;
 }
 
-
-int storeTaskData(int idx, const char *file) {
-	int ret = 1;
-
-	// open storage file in append mode
-	// first line: current date/time
-	// then: add task data
-
-	int fd = -1;
-	if ((fd = open(file, O_CREAT | O_APPEND | O_RDWR, 0666)) < 0) {
-		log_error("could not open savefile: %s\n", strerror(errno));
-		return 0;
-	}
-
-	time_t now;
-	char buf[MAX_TEXT * (TASKS * 2)];
-	struct tm *tm_info;
-
-	now = time(NULL);
-	tm_info = localtime(&now);
-	strftime(buf, sizeof(buf), "%Y-%m-%d %H:%M:%S", tm_info);
-	if (write(fd, buf, strlen(buf)) < (int)strlen(buf)) {
-		log_error("failed to write to savefile\n");
-		ret = 0;
-	}
-
-	getTaskData(idx, buf, sizeof(buf));
-	if (write(fd, buf, strlen(buf)) < (int)strlen(buf)) {
-		log_error("failed to write to savefile\n");
-		ret = 0;
-	}
-
-	getCumTaskTime(buf, sizeof(buf));
-	if (write(fd, buf, strlen(buf)) < (int)strlen(buf)) {
-		log_error("failed to write to savefile\n");
-		ret = 0;
-	}
-
-	snprintf(buf, sizeof(buf), "\n-------------------\n");
-	if (write(fd, buf, strlen(buf)) < (int)strlen(buf)) {
-		log_error("failed to write to savefile\n");
-		ret = 0;
-	}
-	close(fd);
-	return ret;
-}
-
-void getTaskString(task_t *t, char *buf, size_t n) {
+void getStringFromTask(task_t *t, char *buf, size_t n) {
 	int restart = 0;
 	char active[4] = "";
 
@@ -158,6 +104,52 @@ void getTaskString(task_t *t, char *buf, size_t n) {
 	if (restart) {
 		startTask(t->id);
 	}
+}
+
+int storeTaskData(int idx, const char *file) {
+	int ret = 0;
+
+	// open storage file in append mode
+	// first line: current date/time
+	// then: add task data
+
+	int fd = -1;
+	if ((fd = open(file, O_CREAT | O_APPEND | O_RDWR, 0666)) < 0) {
+		log_error("could not open savefile: %s\n", strerror(errno));
+		return 1;
+	}
+
+	time_t now;
+	char buf[MAX_TEXT * (TASKS * 2)];
+	struct tm *tm_info;
+
+	now = time(NULL);
+	tm_info = localtime(&now);
+	strftime(buf, sizeof(buf), "%Y-%m-%d %H:%M:%S", tm_info);
+	if (write(fd, buf, strlen(buf)) < (int)strlen(buf)) {
+		log_error("failed to write to savefile\n");
+		ret++;
+	}
+
+	getStringFromIndex(idx, buf, sizeof(buf));
+	if (write(fd, buf, strlen(buf)) < (int)strlen(buf)) {
+		log_error("failed to write to savefile\n");
+		ret++;
+	}
+
+	getCumTaskTime(buf, sizeof(buf));
+	if (write(fd, buf, strlen(buf)) < (int)strlen(buf)) {
+		log_error("failed to write to savefile\n");
+		ret++;
+	}
+
+	snprintf(buf, sizeof(buf), "\n-------------------\n");
+	if (write(fd, buf, strlen(buf)) < (int)strlen(buf)) {
+		log_error("failed to write to savefile\n");
+		ret++;
+	}
+	close(fd);
+	return ret;
 }
 
 int getCumTaskTime(char *buf, size_t n) {
@@ -188,26 +180,25 @@ int getCumTaskTime(char *buf, size_t n) {
 
 int stopTask(int idx) {
 
+	if ((idx - 1) < 0) return -1;
+
 	log_debug("stopping task %d\n", idx);
 
-	if (idx != g_tasks.active) {
+	if (idx-- != g_tasks.active) {
 		log_debug("not stopping an already stopped task\n");
 		return 1;
 	}
-
-	// task array starts at 0
-	idx -= 1;
 
 	time_t now = time(NULL);
 	g_tasks.task[idx].cum += (now - g_tasks.task[idx].start);
 	g_tasks.task[idx].active = 0;
 
 	g_tasks.active = 0;
-
-	return 1;
+	return 0;
 }
 
 int startTask(int idx) {
+	if ((idx - 1) < 0) return -1;
 
 	log_debug("starting task %d\n", idx);
 
@@ -223,6 +214,5 @@ int startTask(int idx) {
 	g_tasks.task[idx].active = 1;
 
 	g_tasks.active = g_tasks.task[idx].id;
-
-	return 1;
+	return 0;
 }

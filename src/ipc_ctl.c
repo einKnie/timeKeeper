@@ -106,7 +106,7 @@ int handleMsg(struct msg message) {
 
 	switch(message.type) {
 		case EStartCtr:
-			if (!taskHasName(message.idx)) {
+			if (taskHasName(message.idx) == 0) {
 				char in[MAX_TEXT] = "\0";
 				if (!getInput("Task name:", in, sizeof(in))) {
 					break;

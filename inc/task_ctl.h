@@ -30,48 +30,55 @@ void initTasks();
 
 /// Switch to task \a idx
 /// @param [in] idx index of next task. if 0, stop all tasks
-/// @return 1 on success, 0 on failure
 /// @note: any previously active task is stopped
-int switchToTask(int idx);
+void switchToTask(int idx);
 
 /// Check if task \a idx has a name
-/// @param [in] idx index of task
-/// @return 0 if no name, 1 if name
+/// @param [in] idx index of task, must be >0
+/// @return length of name (0 if no name), <0 on invalid index
 int taskHasName(int idx);
 
 /// Set a name for task \a idx
-/// @param [in] idx index of task
+/// @param [in] idx index of task, must be >0
 /// @param [in] name
-/// @return 0 on failure, 1 on success
+/// @return 0 on success, -1 on invalid idx
 int setTaskName(int idx, const char *name);
 
+/// Show a notification containing the current task data
+/// @param [in] idx index of task, or 0 to show data of all tasks
+void showTaskData(int idx);
+
+/// Write task data to string \a buf from index
+/// @param [in] idx index of task, or 0 for data of all tasks
+/// @param [in,out] buf holds collected task data after successful call
+/// @param [in] n size of provided buffer \a buf
+void getStringFromIndex(int idx, char *buf, size_t n);
+
+/// Write task data to \a buf from struct
+/// @param [in] t task struct
+/// @param [in,out] buf holds collected task data after successful call
+/// @param [in] n size of provided buffer \a buf
+void getStringFromTask(task_t *t, char *buf, size_t n);
+
 /// Write data of task \idx to file
-/// @param idx index of task, if 0, write all tasks
-/// @return 1 on success, 0 on failure
+/// @param idx index of task, or 0 to write all tasks
+/// @return 0 on success, >0 on errors
 int storeTaskData(int idx, const char *file);
 
-/// Write task data to string \a buf
-int getTaskData(int idx, char *buf, size_t n);
-
-/// Show a notification containing the current task data
-int showTaskData(int idx);
-
-/// Write task data to \a buf
-/// @param [in] t task
-/// @param [in,out] buf
-/// @param [in] n size of buffer
-void getTaskString(task_t *t, char *buf, size_t n);
-
-/// Return the cumulative time spent on all tasks
-/// @param [in,out] buf holds stringified time after successful call
+/// Get the cumulative time spent on all tasks
+/// @param [in,out] buf holds human-readable time string after successful call
 /// @param [in] n size of \a buf
-/// @returns cumulative time in seconds
+/// @return cumulative time in seconds
 int getCumTaskTime(char *buf, size_t n);
 
 /// Stop a running task
+/// @param idx index of task
+/// @return 0 on success, 1 if process already stopped, -1 on invalid index
 int stopTask(int idx);
 
 // Start a task
+/// @param idx index of task
+/// @return 0 on success, 1 if process already running, -1 on invalid index
 int startTask(int idx);
 
 #endif
