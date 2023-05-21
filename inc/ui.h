@@ -16,17 +16,19 @@
 /// Send a notification
 /// @param [in] text
 /// @param [in] t notification timeout in seconds [ 0 == no timeout ]
-void notify(const char *text, int t);
+/// @return 0 on success, <0 on error
+int notify(const char *text, int t);
 
 /// Get user input
 /// @param [in] prompt
 /// @param [in,out] out holds user input after successful call
 /// @param [in] n size of \a out buffer
-/// @return 1 on success, 0 on failure/abort
+/// @return 0 on success, 1 on user abort, -1 on error
 int  getInput(const char *prompt, char *out, size_t n);
 
 /// Show a popup
-/// @param [in] text
-void popup(const char *text);
+/// @param [in] text#
+/// @return 0 on success, 1 on user abort, -1 on error
+int popup(const char *text);
 
 #endif

@@ -12,7 +12,7 @@
 #include <unistd.h>
 #include "ui.h"
 
-void notify(const char *text, int t) {
+int notify(const char *text, int t) {
 
 	int ret = 0;
 	char outbuf[MAX_TEXT*12];
@@ -24,7 +24,7 @@ void notify(const char *text, int t) {
 	if ((ret = system(outbuf)) < 0) {
 		log_error("failed to send notification: %d\n", ret);
 	}
-
+	return ret;
 }
 
 int getInput(const char *prompt, char *out, size_t n) {
@@ -33,19 +33,24 @@ int getInput(const char *prompt, char *out, size_t n) {
 	snprintf(buf, sizeof(buf), "zenity --entry --text=\"%s\"", prompt);
 
 	FILE *fd = popen(buf, "r");
+	if (fd == NULL) {
+		log_error("failed to call zenity");
+		return -1;
+	}
+
 	fgets(out, n, fd);
 	if (strlen(out) < 1) {
 		log_debug("user input aborted\n");
 		popup("Aborted");
-		return 0;
+		return 1;
 	}
 	out[strlen(out) -1] = '\0';
 	log_debug("Got user input: %s\n", out);
-	return 1;
+	return 0;
 
 }
 
-void popup(const char *text) {
+int popup(const char *text) {
 
 	int ret = 0;
 	char buf[MAX_TEXT] = "\0";
@@ -53,5 +58,5 @@ void popup(const char *text) {
 	if ((ret = system(buf)) < 0) {
 		log_error("failed to show popup\n");
 	}
-
+	return ret;
 }
