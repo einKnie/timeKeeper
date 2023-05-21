@@ -27,6 +27,24 @@ int notify(const char *text, int t) {
 	return ret;
 }
 
+int notifyTaskStart(int idx, const char* text) {
+
+	char buf[MAX_TEXT*12];
+
+	snprintf(buf, sizeof(buf), "Started Task %d: %s", idx, text);
+	return notify(buf, INFO_TIMEOUT);
+	
+}
+
+int notifyTaskStop(int idx, const char* text) {
+
+	char buf[MAX_TEXT*12];
+
+	snprintf(buf, sizeof(buf), "Stopped Task %d: %s", idx, text);
+	return notify(buf, INFO_TIMEOUT);
+	
+}
+
 int getInput(const char *prompt, char *out, size_t n) {
 
 	char buf[MAX_TEXT] = "\0";

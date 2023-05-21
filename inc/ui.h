@@ -19,6 +19,18 @@
 /// @return 0 on success, <0 on error
 int notify(const char *text, int t);
 
+/// Notify of task start
+/// @param idx index of task
+/// @param text name of task
+/// @return 0 on success, <0 on error
+int notifyTaskStart(int idx, const char* text);
+
+/// Notify of task stop
+/// @param idx index of task
+/// @param text name of task
+/// @return 0 on success, <0 on error
+int notifyTaskStop(int idx, const char* text);
+
 /// Get user input
 /// @param [in] prompt
 /// @param [in,out] out holds user input after successful call
